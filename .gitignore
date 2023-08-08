@@ -7,3 +7,4 @@ src/backend/bin
 src/backend/lib
 src/backend/include
 pyvenv.cfg
+__pycache__
