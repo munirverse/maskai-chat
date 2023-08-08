@@ -3,3 +3,7 @@ node_modules
 data/*
 !data/.gitkeep
 .env
+src/backend/bin
+src/backend/lib
+src/backend/include
+pyvenv.cfg
