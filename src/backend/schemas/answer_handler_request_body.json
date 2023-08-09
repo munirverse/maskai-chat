@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "properties": {
+    "model": { "type": "string" },
+    "messages": {
+      "type": "array",
+      "items": { "role": "string", "content": "string" },
+      "required": ["role", "content"]
+    }
+  },
+  "required": ["model", "messages"]
+}
