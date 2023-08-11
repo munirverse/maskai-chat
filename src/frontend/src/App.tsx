@@ -1,20 +1,20 @@
-import { Box, Flex } from '@chakra-ui/react';
+import { Flex } from '@chakra-ui/react';
+import DefaultLayout from './components/DefaultLayout';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
+import './assets/custom.scss';
 
 function App() {
     return (
         <>
-            <Box h="100vh">
-                <Flex flexDirection={'column'} h={'full'}>
-                    <Navbar></Navbar>
-                    <Flex flex={'1'}>
-                        <Sidebar></Sidebar>
-                        <MainContent></MainContent>
-                    </Flex>
+            <DefaultLayout>
+                <Navbar></Navbar>
+                <Flex flex={'1'}>
+                    <Sidebar></Sidebar>
+                    <MainContent></MainContent>
                 </Flex>
-            </Box>
+            </DefaultLayout>
         </>
     );
 }
