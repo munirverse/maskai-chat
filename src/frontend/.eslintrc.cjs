@@ -15,5 +15,6 @@ module.exports = {
             { allowConstantExport: true },
         ],
         indent: ['error', 4],
+        '@typescript-eslint/ban-ts-comment': 'off',
     },
 };
