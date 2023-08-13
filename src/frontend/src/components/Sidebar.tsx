@@ -6,15 +6,15 @@ import {
     FlexProps,
     Button,
     ButtonProps,
-    Text,
     HStack,
     useColorModeValue,
     useMediaQuery,
 } from '@chakra-ui/react';
 import { PlusSquareIcon } from '@chakra-ui/icons';
 import { HTMLMotionProps, motion } from 'framer-motion';
-import ChatTitleItems from './ChatTitleItems';
+import ChatTitleItems from './ChatTitleList';
 import { SidebarMobileContext } from '../Contexts';
+import SidebarActionBottom from './SidebarActionBottom';
 
 export default function Sidebar() {
     // @ts-ignore
@@ -41,9 +41,6 @@ export default function Sidebar() {
         bg: useColorModeValue('green.400', 'green.700'),
         w: 'full',
     };
-    const sideBarActionBottomProps: BoxProps = {
-        bg: useColorModeValue('gray.100', 'gray.900'),
-    };
 
     if (!isActiveSidebarMobile && !isDekstopView) {
         sidebarBoxProps.display = 'none';
@@ -54,31 +51,28 @@ export default function Sidebar() {
         sideBarTransitionsProps.style = { display: 'none' };
     }
 
-    const sideBarContent = () => (
+    const SidebarContent = () => (
         <Flex {...sidebarFlexProps}>
             <Box {...sidebarActionTopProps}>
-                <Button {...sidebarNewChatButtonProps}>
-                    <HStack>
-                        <PlusSquareIcon></PlusSquareIcon>
-                        <Text>New Chat</Text>
-                    </HStack>
-                </Button>
+                <HStack>
+                    <Button
+                        leftIcon={<PlusSquareIcon />}
+                        {...sidebarNewChatButtonProps}
+                    >
+                        New Chat
+                    </Button>
+                </HStack>
             </Box>
             <ChatTitleItems></ChatTitleItems>
-            <Box {...sideBarActionBottomProps}>
-                <Text>
-                    {isActiveSidebarMobile ? 'Testing' : 'Not testing'}
-                    {isDekstopView ? ' desktop' : ' mobile'}
-                </Text>
-            </Box>
+            <SidebarActionBottom></SidebarActionBottom>
         </Flex>
     );
 
     return isDekstopView ? (
-        <Box {...sidebarBoxProps}>{sideBarContent()}</Box>
+        <Box {...sidebarBoxProps}>{SidebarContent()}</Box>
     ) : (
         <motion.div layout {...sideBarTransitionsProps}>
-            <Box {...sidebarBoxProps}>{sideBarContent()}</Box>
+            <Box {...sidebarBoxProps}>{SidebarContent()}</Box>
         </motion.div>
     );
 }
