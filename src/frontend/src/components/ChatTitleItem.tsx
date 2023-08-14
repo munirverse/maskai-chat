@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, KeyboardEvent } from 'react';
 import {
     Box,
     BoxProps,
@@ -24,11 +24,13 @@ import {
 interface ChatTitleItemProps {
     id: string;
     text: string;
+    onSelect: () => void;
+    onDeleteConfirmation: () => void;
+    onSave: (indexId: string, currentTextValue: string) => void;
+    isActive?: 0 | 1 | undefined;
 }
 
 export default function ChatTitleItem(props: ChatTitleItemProps) {
-    // @ts-ignore
-    const [isMenuItemHover, setMenuItemHover] = useState(0);
     // @ts-ignore
     const [isEditMode, setEditMode] = useState(0);
     // @ts-ignore
@@ -36,49 +38,69 @@ export default function ChatTitleItem(props: ChatTitleItemProps) {
 
     const chatTitleItemBoxProps: BoxProps = {
         p: '1rem',
+        bg: useColorModeValue(
+            props.isActive ? 'gray.200' : 'white',
+            props.isActive ? 'black' : 'gray.800'
+        ),
         _hover: {
-            bg: useColorModeValue('gray.100', 'gray.900'),
+            bg: useColorModeValue(
+                props.isActive ? 'gray.200' : 'gray.100',
+                props.isActive ? 'black' : 'gray.900'
+            ),
             cursor: 'pointer',
         },
         key: props.id,
-        onMouseEnter: () => setMenuItemHover(1),
-        onMouseLeave: () => setMenuItemHover(0),
+        onMouseLeave: () => {
+            setEditMode(0);
+        },
+        onClick: props.onSelect,
     };
     const chatTitleItemTextProps: TextProps = {
         fontSize: 'lg',
     };
-    const chatTitleItemActionButtonProps: StackProps = {};
+    const chatTitleItemActionButtonProps: StackProps = {
+        display: 'none',
+    };
 
-    if (!isMenuItemHover) {
-        chatTitleItemActionButtonProps.display = 'none';
+    if (props.isActive) {
+        delete chatTitleItemActionButtonProps.display;
+    }
+    if (isEditMode) {
+        delete chatTitleItemBoxProps.onClick;
     }
 
-    const closeEditMode = () => {
+    const applyEditAction = (searchDOMInput?: boolean) => {
+        if (searchDOMInput) {
+            const currentText = document.querySelector(
+                `input#inputEdit${props.id}`
+            ) as HTMLInputElement;
+            setTitleText(currentText.value);
+            props.onSave(props.id, currentText.value);
+        }
         setEditMode(0);
     };
-    const applyEditAction = () => {
-        setEditMode(0);
-    };
-    const changeTitleText = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const changeTitleText = (e: KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             setTitleText(e.currentTarget.value);
+            props.onSave(props.id, e.currentTarget.value);
             applyEditAction();
         }
     };
 
     const InputMode = () => (
-        <InputGroup>
+        <InputGroup size={'md'}>
             <Input
-                defaultValue={props.text}
+                id={`inputEdit${props.id}`}
+                defaultValue={titleText}
                 pr={'5rem'}
                 onKeyDown={changeTitleText}
             ></Input>
             <InputRightElement pr={'2.5rem'}>
                 <HStack>
-                    <Button onClick={applyEditAction} size={'xs'}>
+                    <Button onClick={() => applyEditAction(true)} size={'xs'}>
                         <CheckIcon></CheckIcon>
                     </Button>
-                    <Button onClick={closeEditMode} size={'xs'}>
+                    <Button onClick={() => setEditMode(0)} size={'xs'}>
                         <CloseIcon></CloseIcon>
                     </Button>
                 </HStack>
@@ -97,8 +119,15 @@ export default function ChatTitleItem(props: ChatTitleItemProps) {
                         <Text {...chatTitleItemTextProps}>{titleText}</Text>
                     </HStack>
                     <HStack {...chatTitleItemActionButtonProps}>
-                        <EditIcon onClick={() => setEditMode(1)}></EditIcon>
-                        <DeleteIcon></DeleteIcon>
+                        <Button onClick={() => setEditMode(1)} size={'xs'}>
+                            <EditIcon></EditIcon>
+                        </Button>
+                        <Button
+                            size={'xs'}
+                            onClick={props.onDeleteConfirmation}
+                        >
+                            <DeleteIcon></DeleteIcon>
+                        </Button>
                     </HStack>
                 </Flex>
             )}

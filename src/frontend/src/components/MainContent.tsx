@@ -39,7 +39,7 @@ export default function MainContent() {
     const mainContentSendButtonProps: ButtonProps = {
         mr: '1rem',
         mt: '1rem',
-        bg: useColorModeValue('green.400', 'green.700'),
+        colorScheme: 'green',
     };
 
     if (isActiveSidebarMobile) {

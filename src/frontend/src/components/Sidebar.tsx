@@ -38,7 +38,7 @@ export default function Sidebar() {
         p: '1rem',
     };
     const sidebarNewChatButtonProps: ButtonProps = {
-        bg: useColorModeValue('green.400', 'green.700'),
+        colorScheme: 'green',
         w: 'full',
     };
 
