@@ -16,34 +16,11 @@ import {
 } from '@chakra-ui/react';
 import ChatTitleItem from './ChatTitleItem';
 import { useState } from 'react';
-
-interface ChatTitleItem {
-    id: string;
-    title: string;
-    isActive?: 0 | 1;
-}
+import { ChatTitleItem as iChatTitleItem } from '../Interfaces';
 
 export default function ChatTitleItems() {
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const [chatTitleItems, setChatTitleItems] = useState<ChatTitleItem[]>([
-        {
-            id: '1',
-            title: 'chat a',
-            isActive: 1,
-        },
-        {
-            id: '2',
-            title: 'chat b',
-        },
-        {
-            id: '3',
-            title: 'chat c',
-        },
-        {
-            id: '4',
-            title: 'chat d',
-        },
-    ]);
+    const [chatTitleItems, setChatTitleItems] = useState<iChatTitleItem>([]);
     const activeChatTitleItem = () =>
         chatTitleItems.filter((item) => item.isActive).at(0);
 

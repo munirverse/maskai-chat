@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Box, BoxProps, Flex, FlexProps } from '@chakra-ui/react';
-import { SidebarMobileContext } from '../Contexts';
+import { SidebarMobileContext, ChatContentContext } from '../Contexts';
+import { DefaultProps, ChatContent } from '../Interfaces';
 
-interface DefaultLayoutProps {
-    children: React.ReactNode;
-}
-
-export default function DefaultLayout(props: DefaultLayoutProps) {
+export default function DefaultLayout({ children }: DefaultProps) {
     const [isActiveSidebarMobile, setActiveSidebarMobile] = useState(false);
+    const [chatContent, setChatContent] = useState<ChatContent>({
+        titleChatlist: null,
+        activeChatConversation: null,
+    });
 
     const defaultLayoutBoxProps: BoxProps = {
         h: '100vh',
@@ -18,12 +19,14 @@ export default function DefaultLayout(props: DefaultLayoutProps) {
     };
 
     return (
-        <SidebarMobileContext.Provider
-            value={[isActiveSidebarMobile, setActiveSidebarMobile]}
-        >
-            <Box {...defaultLayoutBoxProps}>
-                <Flex {...defaultLayoutFlexProps}>{props.children}</Flex>
-            </Box>
-        </SidebarMobileContext.Provider>
+        <ChatContentContext.Provider value={[chatContent, setChatContent]}>
+            <SidebarMobileContext.Provider
+                value={[isActiveSidebarMobile, setActiveSidebarMobile]}
+            >
+                <Box {...defaultLayoutBoxProps}>
+                    <Flex {...defaultLayoutFlexProps}>{children}</Flex>
+                </Box>
+            </SidebarMobileContext.Provider>
+        </ChatContentContext.Provider>
     );
 }

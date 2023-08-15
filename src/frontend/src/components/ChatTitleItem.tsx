@@ -20,15 +20,7 @@ import {
     CloseIcon,
     CheckIcon,
 } from '@chakra-ui/icons';
-
-interface ChatTitleItemProps {
-    id: string;
-    text: string;
-    onSelect: () => void;
-    onDeleteConfirmation: () => void;
-    onSave: (indexId: string, currentTextValue: string) => void;
-    isActive?: 0 | 1 | undefined;
-}
+import { ChatTitleItemProps } from '../Interfaces';
 
 export default function ChatTitleItem(props: ChatTitleItemProps) {
     // @ts-ignore
