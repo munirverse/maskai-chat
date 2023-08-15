@@ -13,8 +13,8 @@ export interface ChatTitleItemProps extends ChatTitleItem {
 }
 
 export interface ChatContent {
-    titleChatlist: ChatTitleItem[] | unknown;
-    activeChatConversation: unknown;
+    titleChatlist: ChatTitleItem[] | unknown[];
+    activeChatConversation: unknown[];
 }
 
 export interface DefaultProps {

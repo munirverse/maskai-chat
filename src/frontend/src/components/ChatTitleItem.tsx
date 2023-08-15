@@ -26,7 +26,7 @@ export default function ChatTitleItem(props: ChatTitleItemProps) {
     // @ts-ignore
     const [isEditMode, setEditMode] = useState(0);
     // @ts-ignore
-    const [titleText, setTitleText] = useState(props.text);
+    const [titleText, setTitleText] = useState(props.title);
 
     const chatTitleItemBoxProps: BoxProps = {
         p: '1rem',

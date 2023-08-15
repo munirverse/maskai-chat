@@ -15,35 +15,33 @@ import {
     Button,
 } from '@chakra-ui/react';
 import ChatTitleItem from './ChatTitleItem';
-import { useState } from 'react';
+import { useContext } from 'react';
+import { ChatContentContext } from '../Contexts';
 import { ChatTitleItem as iChatTitleItem } from '../Interfaces';
 
 export default function ChatTitleItems() {
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const [chatTitleItems, setChatTitleItems] = useState<iChatTitleItem>([]);
-    const activeChatTitleItem = () =>
-        chatTitleItems.filter((item) => item.isActive).at(0);
+    // @ts-ignore
+    const { chatContent, setActiveTitleChatList } =
+        useContext(ChatContentContext);
 
-    const chatTitleListBoxProps: BoxProps = {
-        w: 'full',
-        flexGrow: 1,
-        overflowY: 'auto',
-        maxH: 'calc(100vh - 72px - 64px - 72px)',
-    };
-    const chatTitleListFlexProps: FlexProps = {
-        flexDirection: 'column',
-    };
+    const activeChatTitleItem = () =>
+        chatContent.titleChatlist
+            .filter((item: iChatTitleItem) => item.isActive)
+            .at(0);
 
     const handleChatItemDelete = (indexId: string | undefined) => {
         if (indexId) {
-            setChatTitleItems((prevItems) =>
-                prevItems.filter((item) => item.id !== indexId)
+            setActiveTitleChatList(
+                chatContent.titleChatlist.filter(
+                    (item: iChatTitleItem) => item.id !== indexId
+                )
             );
         }
     };
     const handleChangeActiveTitleItem = (indexId: string) => {
-        setChatTitleItems((prevItems) =>
-            prevItems.map((item) => {
+        setActiveTitleChatList(
+            chatContent.titleChatlist.map((item: iChatTitleItem) => {
                 if (item.isActive && item.id !== indexId) {
                     delete item.isActive;
                 }
@@ -66,8 +64,8 @@ export default function ChatTitleItems() {
         indexId: string,
         currentTextValue: string
     ) => {
-        setChatTitleItems((prevItems) =>
-            prevItems.map((item) => {
+        setActiveTitleChatList(
+            chatContent.titleChatlist.map((item: iChatTitleItem) => {
                 if (item.id === indexId) {
                     item.title = currentTextValue;
                 }
@@ -76,15 +74,25 @@ export default function ChatTitleItems() {
         );
     };
 
+    const chatTitleListBoxProps: BoxProps = {
+        w: 'full',
+        flexGrow: 1,
+        overflowY: 'auto',
+        maxH: 'calc(100vh - 72px - 64px - 72px)',
+    };
+    const chatTitleListFlexProps: FlexProps = {
+        flexDirection: 'column',
+    };
+
     return (
         <Box {...chatTitleListBoxProps}>
             <Flex {...chatTitleListFlexProps}>
                 <Stack spacing={0}>
-                    {chatTitleItems.map((item) => (
+                    {chatContent.titleChatlist.map((item: iChatTitleItem) => (
                         <ChatTitleItem
                             key={item.id}
                             id={item.id}
-                            text={item.title}
+                            title={item.title}
                             onSelect={() =>
                                 handleChangeActiveTitleItem(item.id)
                             }
