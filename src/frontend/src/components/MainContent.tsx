@@ -9,17 +9,19 @@ import {
     Button,
     ButtonProps,
     useColorModeValue,
-    Text,
-    Stack,
 } from '@chakra-ui/react';
 import { ArrowForwardIcon } from '@chakra-ui/icons';
 import { MessageTextArea } from './MessageTextArea';
-import { SidebarMobileContext } from '../Contexts';
-import MaskaiChatIcon from './MaskaiChatIcon';
+import { SidebarMobileContext, ChatContentContext } from '../Contexts';
+import { MainContentDefault } from './MainContentDefault';
+import { MainContentSkeleton } from './MainContentSkeleton';
+import { ChatActiveLoadingState } from '../Interfaces';
 
 export default function MainContent() {
     // @ts-ignore
     const [isActiveSidebarMobile] = useContext(SidebarMobileContext);
+    // @ts-ignore
+    const { chatContent } = useContext(ChatContentContext);
 
     const mainContentBoxProps: BoxProps = {
         h: 'full',
@@ -30,8 +32,15 @@ export default function MainContent() {
         flexDirection: 'column',
         h: 'full',
     };
+    const mainContentWrapperProps: BoxProps = {
+        m: '0 auto',
+        w: 'full',
+        p: '2rem',
+        maxH: 'calc(100vh - 120px - 64px)',
+        overflow: 'scroll',
+    };
     const mainContentChatInputProps: BoxProps = {
-        minH: '110px',
+        minH: '120px',
         w: 'full',
         p: '2rem',
         bgGradient: useColorModeValue(
@@ -49,48 +58,23 @@ export default function MainContent() {
         mainContentBoxProps.display = 'none';
     }
 
+    const mainContentDisplay = {
+        [ChatActiveLoadingState.NOT_INIT]: () => <MainContentDefault />,
+        [ChatActiveLoadingState.LOADING]: () => <MainContentSkeleton />,
+        [ChatActiveLoadingState.ACTIVE]: () => <MainContent />,
+    };
+
+    // @ts-ignore
+    const MainContentDisplayRender =
+        // @ts-ignore
+        mainContentDisplay[chatContent.activeChatState];
+
     return (
         <Box {...mainContentBoxProps}>
             <Flex {...mainContentFlexProps}>
                 <Box flexGrow={'1'}>
-                    <Box m={'0 auto'} w={'full'} p={'2rem'}>
-                        <Stack
-                            textAlign={'center'}
-                            alignItems={'center'}
-                            spacing={1}
-                        >
-                            <MaskaiChatIcon
-                                fontSize={'9xl'}
-                                color={useColorModeValue(
-                                    'gray.400',
-                                    'gray.800'
-                                )}
-                            ></MaskaiChatIcon>
-                            <Text
-                                fontSize={'4xl'}
-                                mt={'-2.5rem'}
-                                color={useColorModeValue(
-                                    'gray.400',
-                                    'gray.800'
-                                )}
-                            >
-                                Mask Chat AI
-                            </Text>
-                            <Box
-                                bg={useColorModeValue('gray.300', 'gray.800')}
-                                color={useColorModeValue(
-                                    'gray.500',
-                                    'gray.600'
-                                )}
-                                fontSize={'md'}
-                                p={'1rem'}
-                                borderRadius={'0.5rem'}
-                            >
-                                "Masking UI of Chatgpt & OpenAI API for
-                                yourself"<br></br>
-                                Click `New Chat` and enjoy 😉
-                            </Box>
-                        </Stack>
+                    <Box {...mainContentWrapperProps}>
+                        <MainContentDisplayRender></MainContentDisplayRender>
                     </Box>
                 </Box>
                 <Box {...mainContentChatInputProps}>

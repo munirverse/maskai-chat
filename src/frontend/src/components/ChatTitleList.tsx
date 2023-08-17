@@ -35,7 +35,8 @@ export default function ChatTitleItems() {
             setActiveTitleChatList(
                 chatContent.titleChatlist.filter(
                     (item: iChatTitleItem) => item.id !== indexId
-                )
+                ),
+                ''
             );
         }
     };
@@ -50,7 +51,8 @@ export default function ChatTitleItems() {
                 }
 
                 return item;
-            })
+            }),
+            indexId
         );
     };
     const handleConfirmDeleteButton = (

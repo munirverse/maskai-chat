@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { Box, BoxProps, Flex, FlexProps } from '@chakra-ui/react';
 import { SidebarMobileContext, ChatContentContext } from '../Contexts';
-import { DefaultProps, ChatContent } from '../Interfaces';
+import {
+    DefaultProps,
+    ChatContent,
+    ChatActiveLoadingState,
+} from '../Interfaces';
 
 export default function DefaultLayout({ children }: DefaultProps) {
     const storedTitleChatList = localStorage.getItem('titleChatlist');
@@ -35,6 +39,8 @@ export default function DefaultLayout({ children }: DefaultProps) {
         activeChatConversation: storedActiveChatConversation
             ? JSON.parse(storedActiveChatConversation)
             : [],
+        activeChatKeyId: '',
+        activeChatState: ChatActiveLoadingState.NOT_INIT,
     });
 
     const sidebarMobileContextValue = [
@@ -43,10 +49,15 @@ export default function DefaultLayout({ children }: DefaultProps) {
     ];
     const chatContentContextValue = {
         chatContent,
-        setActiveTitleChatList: (titleChatListData: unknown[]) => {
+        setActiveTitleChatList: (
+            titleChatListData: unknown[],
+            titleChatId: string
+        ) => {
             setChatContent((previousChatContent) => ({
                 ...previousChatContent,
                 titleChatlist: titleChatListData,
+                activeChatKeyId: titleChatId,
+                activeChatState: ChatActiveLoadingState.LOADING,
             }));
             localStorage.setItem(
                 'titleChatlist',
