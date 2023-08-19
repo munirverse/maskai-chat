@@ -5,6 +5,7 @@ import {
     DefaultProps,
     ChatContent,
     ChatActiveLoadingState,
+    ChatTitleItem,
 } from '../Interfaces';
 
 export default function DefaultLayout({ children }: DefaultProps) {
@@ -17,25 +18,7 @@ export default function DefaultLayout({ children }: DefaultProps) {
     const [chatContent, setChatContent] = useState<ChatContent>({
         titleChatlist: storedTitleChatList
             ? JSON.parse(storedTitleChatList)
-            : [
-                  {
-                      id: '1',
-                      title: 'chat a',
-                      isActive: 1,
-                  },
-                  {
-                      id: '2',
-                      title: 'chat b',
-                  },
-                  {
-                      id: '3',
-                      title: 'chat c',
-                  },
-                  {
-                      id: '4',
-                      title: 'chat d',
-                  },
-              ],
+            : [],
         activeChatConversation: storedActiveChatConversation
             ? JSON.parse(storedActiveChatConversation)
             : [],
@@ -50,7 +33,7 @@ export default function DefaultLayout({ children }: DefaultProps) {
     const chatContentContextValue = {
         chatContent,
         setActiveTitleChatList: (
-            titleChatListData: unknown[],
+            titleChatListData: ChatTitleItem[],
             titleChatId: string
         ) => {
             setChatContent((previousChatContent) => ({
@@ -73,6 +56,25 @@ export default function DefaultLayout({ children }: DefaultProps) {
                 'activeChatConversation',
                 JSON.stringify(activeChatConversationData)
             );
+        },
+        setNewChatMode: () => {
+            setChatContent((previousChatContent) => ({
+                ...previousChatContent,
+                activeChatKeyId: '',
+                activeChatState: ChatActiveLoadingState.NOT_INIT,
+                activeChatConversation: [],
+            }));
+        },
+        setClearActiveChat: () => {
+            setChatContent((previousChatContent) => ({
+                ...previousChatContent,
+                titleChatlist: previousChatContent.titleChatlist.map(
+                    (item: ChatTitleItem) => {
+                        if (item.isActive) delete item.isActive;
+                        return item;
+                    }
+                ),
+            }));
         },
     };
 

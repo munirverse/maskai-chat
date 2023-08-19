@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import {
     Box,
     BoxProps,
@@ -13,12 +13,15 @@ import {
 import { PlusSquareIcon } from '@chakra-ui/icons';
 import { HTMLMotionProps, motion } from 'framer-motion';
 import ChatTitleItems from './ChatTitleList';
-import { SidebarMobileContext } from '../Contexts';
+import { SidebarMobileContext, ChatContentContext } from '../Contexts';
 import SidebarActionBottom from './SidebarActionBottom';
 
 export default function Sidebar() {
     // @ts-ignore
     const [isActiveSidebarMobile] = useContext(SidebarMobileContext);
+    // @ts-ignore
+    const { setNewChatMode, setActiveChatConversation, setClearActiveChat } =
+        useContext(ChatContentContext);
     const [isDekstopView] = useMediaQuery('(min-width: 768px)');
 
     const sideBarTransitionsProps: HTMLMotionProps<'div'> = {
@@ -51,11 +54,28 @@ export default function Sidebar() {
         sideBarTransitionsProps.style = { display: 'none' };
     }
 
+    const activateMessageTextArea = () => {
+        setNewChatMode();
+        setActiveChatConversation([]);
+        setClearActiveChat();
+        const textArea = document.querySelector<HTMLTextAreaElement>(
+            '#chatMessageTextArea'
+        )!;
+        textArea.focus();
+    };
+
+    useEffect(() => {
+        // @ts-ignore
+        document.querySelector('#chatMessageTextArea').value = '';
+    });
+
     const SidebarContent = () => (
         <Flex {...sidebarFlexProps}>
             <Box {...sidebarActionTopProps}>
                 <HStack>
                     <Button
+                        id="newChatButton"
+                        onClick={activateMessageTextArea}
                         leftIcon={<PlusSquareIcon />}
                         {...sidebarNewChatButtonProps}
                     >

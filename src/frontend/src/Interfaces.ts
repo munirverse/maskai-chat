@@ -19,7 +19,7 @@ export const ChatActiveLoadingState = {
 } as const;
 
 export interface ChatContent {
-    titleChatlist: ChatTitleItem[] | unknown[];
+    titleChatlist: ChatTitleItem[] | [];
     activeChatConversation: unknown[];
     activeChatKeyId: string;
     activeChatState:

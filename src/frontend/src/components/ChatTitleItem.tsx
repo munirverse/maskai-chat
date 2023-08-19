@@ -1,4 +1,4 @@
-import { useState, KeyboardEvent } from 'react';
+import { useState, KeyboardEvent, useRef, useEffect } from 'react';
 import {
     Box,
     BoxProps,
@@ -12,6 +12,7 @@ import {
     InputRightElement,
     Button,
     useColorModeValue,
+    forwardRef,
 } from '@chakra-ui/react';
 import {
     ChatIcon,
@@ -27,6 +28,14 @@ export default function ChatTitleItem(props: ChatTitleItemProps) {
     const [isEditMode, setEditMode] = useState(0);
     // @ts-ignore
     const [titleText, setTitleText] = useState(props.title);
+    const chatTitleInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (chatTitleInputRef.current) {
+            console.log(chatTitleInputRef.current);
+            chatTitleInputRef.current.focus();
+        }
+    });
 
     const chatTitleItemBoxProps: BoxProps = {
         p: '1rem',
@@ -61,6 +70,9 @@ export default function ChatTitleItem(props: ChatTitleItemProps) {
         delete chatTitleItemBoxProps.onClick;
     }
 
+    const openEditMode = () => {
+        setEditMode(1);
+    };
     const applyEditAction = (searchDOMInput?: boolean) => {
         if (searchDOMInput) {
             const currentText = document.querySelector(
@@ -79,14 +91,14 @@ export default function ChatTitleItem(props: ChatTitleItemProps) {
         }
     };
 
-    const InputMode = () => (
+    const InputMode = forwardRef((props, ref) => (
         <InputGroup size={'md'}>
             <Input
-                id={`inputEdit${props.id}`}
-                defaultValue={titleText}
+                ref={ref}
                 pr={'5rem'}
                 onKeyDown={changeTitleText}
                 focusBorderColor={useColorModeValue('green.400', 'green.400')}
+                {...props}
             ></Input>
             <InputRightElement pr={'2.5rem'}>
                 <HStack>
@@ -99,20 +111,28 @@ export default function ChatTitleItem(props: ChatTitleItemProps) {
                 </HStack>
             </InputRightElement>
         </InputGroup>
-    );
+    ));
 
     return (
         <Box {...chatTitleItemBoxProps}>
             {isEditMode ? (
-                <InputMode></InputMode>
+                <InputMode
+                    ref={chatTitleInputRef}
+                    id={`inputEdit${props.id}`}
+                    defaultValue={titleText}
+                ></InputMode>
             ) : (
                 <Flex justifyContent={'space-between'}>
                     <HStack>
                         <ChatIcon></ChatIcon>
-                        <Text {...chatTitleItemTextProps}>{titleText}</Text>
+                        <Text {...chatTitleItemTextProps}>
+                            {titleText.length > 18
+                                ? titleText.slice(0, 18) + '...'
+                                : titleText}
+                        </Text>
                     </HStack>
                     <HStack {...chatTitleItemActionButtonProps}>
-                        <Button onClick={() => setEditMode(1)} size={'xs'}>
+                        <Button onClick={openEditMode} size={'xs'}>
                             <EditIcon></EditIcon>
                         </Button>
                         <Button

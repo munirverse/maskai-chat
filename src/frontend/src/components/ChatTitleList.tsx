@@ -22,7 +22,7 @@ import { ChatTitleItem as iChatTitleItem } from '../Interfaces';
 export default function ChatTitleItems() {
     const { isOpen, onOpen, onClose } = useDisclosure();
     // @ts-ignore
-    const { chatContent, setActiveTitleChatList } =
+    const { chatContent, setActiveTitleChatList, setNewChatMode } =
         useContext(ChatContentContext);
 
     const activeChatTitleItem = () =>
@@ -61,6 +61,7 @@ export default function ChatTitleItems() {
     ) => {
         handleChatItemDelete(indexId);
         handleModalClose();
+        setNewChatMode();
     };
     const handleChangeChatTitle = (
         indexId: string,
@@ -90,19 +91,22 @@ export default function ChatTitleItems() {
         <Box {...chatTitleListBoxProps}>
             <Flex {...chatTitleListFlexProps}>
                 <Stack spacing={0}>
-                    {chatContent.titleChatlist.map((item: iChatTitleItem) => (
-                        <ChatTitleItem
-                            key={item.id}
-                            id={item.id}
-                            title={item.title}
-                            onSelect={() =>
-                                handleChangeActiveTitleItem(item.id)
-                            }
-                            isActive={item.isActive || 0}
-                            onDeleteConfirmation={onOpen}
-                            onSave={handleChangeChatTitle}
-                        ></ChatTitleItem>
-                    ))}
+                    {chatContent.titleChatlist
+                        .slice()
+                        .reverse()
+                        .map((item: iChatTitleItem) => (
+                            <ChatTitleItem
+                                key={item.id}
+                                id={item.id}
+                                title={item.title}
+                                onSelect={() =>
+                                    handleChangeActiveTitleItem(item.id)
+                                }
+                                isActive={item.isActive || 0}
+                                onDeleteConfirmation={onOpen}
+                                onSave={handleChangeChatTitle}
+                            ></ChatTitleItem>
+                        ))}
                 </Stack>
             </Flex>
             <Modal isOpen={isOpen} onClose={onClose}>

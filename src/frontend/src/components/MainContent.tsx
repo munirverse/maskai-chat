@@ -21,7 +21,8 @@ export default function MainContent() {
     // @ts-ignore
     const [isActiveSidebarMobile] = useContext(SidebarMobileContext);
     // @ts-ignore
-    const { chatContent } = useContext(ChatContentContext);
+    const { chatContent, setActiveTitleChatList } =
+        useContext(ChatContentContext);
 
     const mainContentBoxProps: BoxProps = {
         h: 'full',
@@ -69,6 +70,26 @@ export default function MainContent() {
         // @ts-ignore
         mainContentDisplay[chatContent.activeChatState];
 
+    const submitMessage = (message?: string | undefined) => {
+        if (
+            !chatContent.activeChatKeyId &&
+            chatContent.activeChatState === ChatActiveLoadingState.NOT_INIT
+        ) {
+            const uniqueId = new Date().getTime().toString(32);
+            setActiveTitleChatList(
+                chatContent.titleChatlist.concat([
+                    {
+                        id: uniqueId,
+                        title: message?.slice(0, 50),
+                        isActive: 1,
+                    },
+                ]),
+                uniqueId
+            );
+        }
+        console.log(message);
+    };
+
     return (
         <Box {...mainContentBoxProps}>
             <Flex {...mainContentFlexProps}>
@@ -79,9 +100,14 @@ export default function MainContent() {
                 </Box>
                 <Box {...mainContentChatInputProps}>
                     <InputGroup>
-                        <MessageTextArea></MessageTextArea>
+                        <MessageTextArea
+                            onSubmit={submitMessage}
+                        ></MessageTextArea>
                         <InputRightElement>
-                            <Button {...mainContentSendButtonProps}>
+                            <Button
+                                {...mainContentSendButtonProps}
+                                onClick={() => submitMessage()}
+                            >
                                 <ArrowForwardIcon></ArrowForwardIcon>
                             </Button>
                         </InputRightElement>
