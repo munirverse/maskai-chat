@@ -86,6 +86,7 @@ export default function ChatTitleItem(props: ChatTitleItemProps) {
                 defaultValue={titleText}
                 pr={'5rem'}
                 onKeyDown={changeTitleText}
+                focusBorderColor={useColorModeValue('green.400', 'green.400')}
             ></Input>
             <InputRightElement pr={'2.5rem'}>
                 <HStack>

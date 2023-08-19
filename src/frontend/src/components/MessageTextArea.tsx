@@ -16,9 +16,7 @@ export const MessageTextArea = forwardRef((props, ref) => {
             fontSize={'lg'}
             as={ResizeTextArea}
             ref={ref}
-            _focus={{
-                borderColor: useColorModeValue('green.400', 'green.400'),
-            }}
+            focusBorderColor={useColorModeValue('green.400', 'green.400')}
             {...props}
         ></Textarea>
     );
