@@ -12,22 +12,22 @@ export interface ChatTitleItemProps extends ChatTitleItem {
     onSave: (indexId: string, currentTextValue: string) => void;
 }
 
-export const ChatActiveLoadingState = {
+export interface DefaultProps {
+    children?: ReactNode;
+}
+
+export const ChatLoadingState = {
     NOT_INIT: 'notinit',
     LOADING: 'loading',
     ACTIVE: 'active',
 } as const;
 
 export interface ChatContent {
-    titleChatlist: ChatTitleItem[] | [];
-    activeChatConversation: unknown[];
-    activeChatKeyId: string;
-    activeChatState:
-        | typeof ChatActiveLoadingState.NOT_INIT
-        | typeof ChatActiveLoadingState.LOADING
-        | typeof ChatActiveLoadingState.ACTIVE;
-}
-
-export interface DefaultProps {
-    children?: ReactNode;
+    chatTitleList: ChatTitleItem[] | [];
+    chatActiveConversation: unknown[];
+    chatActiveKey: string;
+    chatLoadingState:
+        | typeof ChatLoadingState.NOT_INIT
+        | typeof ChatLoadingState.LOADING
+        | typeof ChatLoadingState.ACTIVE;
 }

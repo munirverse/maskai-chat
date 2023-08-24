@@ -1,8 +1,7 @@
+import { useContext } from 'react';
 import {
     Box,
-    BoxProps,
     Flex,
-    FlexProps,
     Stack,
     Modal,
     ModalOverlay,
@@ -14,35 +13,34 @@ import {
     ModalCloseButton,
     Button,
 } from '@chakra-ui/react';
-import ChatTitleItem from './ChatTitleItem';
-import { useContext } from 'react';
 import { ChatContentContext } from '../Contexts';
-import { ChatTitleItem as iChatTitleItem } from '../Interfaces';
+import {
+    ChatTitleItem as iChatTitleItem,
+    ChatLoadingState,
+} from '../Interfaces';
+import ChatTitleItem from './ChatTitleItem';
 
 export default function ChatTitleItems() {
-    const { isOpen, onOpen, onClose } = useDisclosure();
-    // @ts-ignore
-    const { chatContent, setActiveTitleChatList, setNewChatMode } =
-        useContext(ChatContentContext);
+    // Chat Context
+    const {
+        // @ts-ignore
+        chatTitleList,
+        // @ts-ignore
+        updateChatTitleList,
+        // @ts-ignore
+        updatechatKey,
+        // @ts-ignore
+        updateChatLoadingState,
+        // @ts-ignore
+        updateChatConversation,
+    } = useContext(ChatContentContext);
 
     const activeChatTitleItem = () =>
-        chatContent.titleChatlist
-            .filter((item: iChatTitleItem) => item.isActive)
-            .at(0);
+        chatTitleList.filter((item: iChatTitleItem) => item.isActive).at(0);
 
-    const handleChatItemDelete = (indexId: string | undefined) => {
-        if (indexId) {
-            setActiveTitleChatList(
-                chatContent.titleChatlist.filter(
-                    (item: iChatTitleItem) => item.id !== indexId
-                ),
-                ''
-            );
-        }
-    };
     const handleChangeActiveTitleItem = (indexId: string) => {
-        setActiveTitleChatList(
-            chatContent.titleChatlist.map((item: iChatTitleItem) => {
+        updateChatTitleList(
+            chatTitleList.map((item: iChatTitleItem) => {
                 if (item.isActive && item.id !== indexId) {
                     delete item.isActive;
                 }
@@ -55,20 +53,24 @@ export default function ChatTitleItems() {
             indexId
         );
     };
-    const handleConfirmDeleteButton = (
-        indexId: string | undefined,
-        handleModalClose: () => void
-    ) => {
-        handleChatItemDelete(indexId);
-        handleModalClose();
-        setNewChatMode();
+
+    const handleChatItemDelete = (indexId: string | undefined) => {
+        if (indexId) {
+            updateChatTitleList(
+                chatTitleList.filter(
+                    (item: iChatTitleItem) => item.id !== indexId
+                ),
+                ''
+            );
+        }
     };
+
     const handleChangeChatTitle = (
         indexId: string,
         currentTextValue: string
     ) => {
-        setActiveTitleChatList(
-            chatContent.titleChatlist.map((item: iChatTitleItem) => {
+        updateChatTitleList(
+            chatTitleList.map((item: iChatTitleItem) => {
                 if (item.id === indexId) {
                     item.title = currentTextValue;
                 }
@@ -77,21 +79,30 @@ export default function ChatTitleItems() {
         );
     };
 
-    const chatTitleListBoxProps: BoxProps = {
-        w: 'full',
-        flexGrow: 1,
-        overflowY: 'auto',
-        maxH: 'calc(100vh - 72px - 64px - 72px)',
-    };
-    const chatTitleListFlexProps: FlexProps = {
-        flexDirection: 'column',
+    // Modal Confirmation State
+    const { isOpen, onOpen, onClose } = useDisclosure();
+
+    const handleConfirmDeleteButton = (
+        indexId: string | undefined,
+        handleModalClose: () => void
+    ) => {
+        handleChatItemDelete(indexId);
+        handleModalClose();
+        updatechatKey('');
+        updateChatLoadingState(ChatLoadingState.NOT_INIT);
+        updateChatConversation([]);
     };
 
     return (
-        <Box {...chatTitleListBoxProps}>
-            <Flex {...chatTitleListFlexProps}>
+        <Box
+            w={'full'}
+            flexGrow={1}
+            overflowY={'auto'}
+            maxH={'calc(100vh - 72px - 64px - 72px)'}
+        >
+            <Flex flexDirection={'column'}>
                 <Stack spacing={0}>
-                    {chatContent.titleChatlist
+                    {chatTitleList
                         .slice()
                         .reverse()
                         .map((item: iChatTitleItem) => (

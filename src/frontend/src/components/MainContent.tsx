@@ -1,83 +1,34 @@
 import { useContext } from 'react';
 import {
     Box,
-    BoxProps,
     Flex,
-    FlexProps,
     InputGroup,
     InputRightElement,
     Button,
-    ButtonProps,
     useColorModeValue,
 } from '@chakra-ui/react';
 import { ArrowForwardIcon } from '@chakra-ui/icons';
-import { MessageTextArea } from './MessageTextArea';
 import { SidebarMobileContext, ChatContentContext } from '../Contexts';
+import { ChatLoadingState } from '../Interfaces';
+import { MessageTextArea } from './MessageTextArea';
 import { MainContentDefault } from './MainContentDefault';
 import { MainContentSkeleton } from './MainContentSkeleton';
-import { ChatActiveLoadingState } from '../Interfaces';
 
 export default function MainContent() {
+    // Sidebar Mobile Context
     // @ts-ignore
     const [isActiveSidebarMobile] = useContext(SidebarMobileContext);
+
+    // Chat Context
     // @ts-ignore
-    const { chatContent, setActiveTitleChatList } =
+    const { chatKey, chatLoadingState, chatTitleList, updateChatTitleList } =
         useContext(ChatContentContext);
 
-    const mainContentBoxProps: BoxProps = {
-        h: 'full',
-        flexGrow: 1,
-        bg: useColorModeValue('gray.200', 'gray.700'),
-    };
-    const mainContentFlexProps: FlexProps = {
-        flexDirection: 'column',
-        h: 'full',
-    };
-    const mainContentWrapperProps: BoxProps = {
-        m: '0 auto',
-        w: 'full',
-        p: '2rem',
-        maxH: 'calc(100vh - 120px - 64px)',
-        overflow: 'scroll',
-    };
-    const mainContentChatInputProps: BoxProps = {
-        minH: '120px',
-        w: 'full',
-        p: '2rem',
-        bgGradient: useColorModeValue(
-            'linear(to-b, transparent, gray.200, gray.300, gray.400)',
-            'linear(to-b, transparent, gray.700, gray.800, gray.900)'
-        ),
-    };
-    const mainContentSendButtonProps: ButtonProps = {
-        mr: '1rem',
-        mt: '1rem',
-        colorScheme: 'green',
-    };
-
-    if (isActiveSidebarMobile) {
-        mainContentBoxProps.display = 'none';
-    }
-
-    const mainContentDisplay = {
-        [ChatActiveLoadingState.NOT_INIT]: () => <MainContentDefault />,
-        [ChatActiveLoadingState.LOADING]: () => <MainContentSkeleton />,
-        [ChatActiveLoadingState.ACTIVE]: () => <MainContent />,
-    };
-
-    // @ts-ignore
-    const MainContentDisplayRender =
-        // @ts-ignore
-        mainContentDisplay[chatContent.activeChatState];
-
-    const submitMessage = (message?: string | undefined) => {
-        if (
-            !chatContent.activeChatKeyId &&
-            chatContent.activeChatState === ChatActiveLoadingState.NOT_INIT
-        ) {
+    const submitMessage = (message: string) => {
+        if (!chatKey && chatLoadingState === ChatLoadingState.NOT_INIT) {
             const uniqueId = new Date().getTime().toString(32);
-            setActiveTitleChatList(
-                chatContent.titleChatlist.concat([
+            updateChatTitleList(
+                chatTitleList.concat([
                     {
                         id: uniqueId,
                         title: message?.slice(0, 50),
@@ -90,23 +41,54 @@ export default function MainContent() {
         console.log(message);
     };
 
+    const mainContentDisplay = {
+        [ChatLoadingState.NOT_INIT]: () => <MainContentDefault />,
+        [ChatLoadingState.LOADING]: () => <MainContentSkeleton />,
+        [ChatLoadingState.ACTIVE]: () => <MainContent />,
+    };
+
+    // @ts-ignore
+    const MainContentDisplayRender =
+        // @ts-ignore
+        mainContentDisplay[chatLoadingState];
+
     return (
-        <Box {...mainContentBoxProps}>
-            <Flex {...mainContentFlexProps}>
+        <Box
+            h={'full'}
+            flexGrow={1}
+            bg={useColorModeValue('gray.200', 'gray.700')}
+            style={{ display: isActiveSidebarMobile ? 'none' : undefined }}
+        >
+            <Flex flexDirection={'column'} h={'full'}>
                 <Box flexGrow={'1'}>
-                    <Box {...mainContentWrapperProps}>
+                    <Box
+                        m={'0 auto'}
+                        w={'full'}
+                        p={'2rem'}
+                        maxH={'calc(100vh - 120px - 64px)'}
+                        overflow={'scroll'}
+                    >
                         <MainContentDisplayRender></MainContentDisplayRender>
                     </Box>
                 </Box>
-                <Box {...mainContentChatInputProps}>
+                <Box
+                    minH={'120px'}
+                    w={'full'}
+                    p={'2rem'}
+                    bgGradient={useColorModeValue(
+                        'linear(to-b, transparent, gray.200, gray.300, gray.400)',
+                        'linear(to-b, transparent, gray.700, gray.800, gray.900)'
+                    )}
+                >
                     <InputGroup>
                         <MessageTextArea
                             onSubmit={submitMessage}
                         ></MessageTextArea>
                         <InputRightElement>
                             <Button
-                                {...mainContentSendButtonProps}
-                                onClick={() => submitMessage()}
+                                mr={'1rem'}
+                                mt={'1rem'}
+                                colorScheme={'green'}
                             >
                                 <ArrowForwardIcon></ArrowForwardIcon>
                             </Button>
