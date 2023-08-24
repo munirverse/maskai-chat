@@ -9,22 +9,40 @@ import {
 } from '@chakra-ui/react';
 import { PlusSquareIcon } from '@chakra-ui/icons';
 import { SidebarMobileContext, ChatContentContext } from '../Contexts';
-import { ChatLoadingState } from '../Interfaces';
+import { ChatLoadingState, ChatTitleItem } from '../Interfaces';
 import ChatTitleItems from './ChatTitleList';
 import SidebarActionBottom from './SidebarActionBottom';
 
 export default function Sidebar() {
     // Chat Context
     // @ts-ignore
-    const { updateChatKey, updateChatLoadingState, updateChatConversation } =
-        useContext(ChatContentContext);
+    const {
+        // @ts-ignore
+        chatTitleList,
+        // @ts-ignore
+        updateChatKey,
+        // @ts-ignore
+        updateChatLoadingState,
+        // @ts-ignore
+        updateChatConversation,
+        // @ts-ignore
+        updateChatTitleList,
+    } = useContext(ChatContentContext);
+
     const [isDekstopView] = useMediaQuery('(min-width: 768px)');
+
     const [newChatMode, setNewChatMode] = useState<boolean>(false);
 
     const triggerNewChatMode = () => {
         updateChatKey('');
         updateChatLoadingState(ChatLoadingState.NOT_INIT);
         updateChatConversation([]);
+        updateChatTitleList(
+            chatTitleList.map((item: ChatTitleItem) => ({
+                ...item,
+                isActive: null,
+            }))
+        );
         setNewChatMode(true);
     };
 

@@ -52,6 +52,7 @@ export default function ChatTitleItems() {
             }),
             indexId
         );
+        updateChatLoadingState(ChatLoadingState.LOADING);
     };
 
     const handleChatItemDelete = (indexId: string | undefined) => {
@@ -79,7 +80,7 @@ export default function ChatTitleItems() {
         );
     };
 
-    // Modal Confirmation State
+    // Modal Confirmation Delete Chat Tittle State
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const handleConfirmDeleteButton = (
