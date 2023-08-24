@@ -1,12 +1,20 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "BE Debugger", 
-            "type": "python",
-            "request": "launch",
-            "program": "${workspaceFolder}/src/backend/main.py",
-            "python": "${workspaceFolder}/src/backend/bin/python"
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "BE Debugger",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/backend/main.py",
+      "python": "${workspaceFolder}/src/backend/bin/python"
+    },
+    {
+      "name": "FE Debugger",
+      "type": "node",
+      "runtimeArgs": ["run-script", "dev"],
+      "runtimeExecutable": "npm",
+      "cwd": "${workspaceFolder}/src/frontend",
+      "console": "integratedTerminal"
+    }
+  ]
 }
