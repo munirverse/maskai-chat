@@ -77,7 +77,7 @@ export default function SidebarActionBottom() {
             <Modal isOpen={isOpen} onClose={onClose}>
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>Are you sure to delete all chat?</ModalHeader>
+                    <ModalHeader>Are you sure to clear all chat?</ModalHeader>
                     <ModalCloseButton></ModalCloseButton>
                     <ModalBody>
                         all chat will be delete after this action
