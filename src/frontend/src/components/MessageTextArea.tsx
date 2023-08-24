@@ -1,4 +1,4 @@
-import { KeyboardEvent, useEffect, useState } from 'react';
+import { KeyboardEvent, useState } from 'react';
 import { Textarea, forwardRef, useColorModeValue } from '@chakra-ui/react';
 import ResizeTextArea from 'react-textarea-autosize';
 

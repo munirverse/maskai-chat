@@ -28,7 +28,7 @@ export default function ChatTitleItems() {
         // @ts-ignore
         updateChatTitleList,
         // @ts-ignore
-        updatechatKey,
+        updateChatKey,
         // @ts-ignore
         updateChatLoadingState,
         // @ts-ignore
@@ -88,7 +88,7 @@ export default function ChatTitleItems() {
     ) => {
         handleChatItemDelete(indexId);
         handleModalClose();
-        updatechatKey('');
+        updateChatKey('');
         updateChatLoadingState(ChatLoadingState.NOT_INIT);
         updateChatConversation([]);
     };

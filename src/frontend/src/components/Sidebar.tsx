@@ -36,7 +36,7 @@ export default function Sidebar() {
         if (newChatMode) {
             const textAreaId = '#chatMessageTextArea';
             document.querySelector<HTMLTextAreaElement>(textAreaId)!.focus();
-            document.querySelector<HTMLInputElement>(textAreaId)!.value = '';
+            document.querySelector<HTMLTextAreaElement>(textAreaId)!.value = '';
             setNewChatMode(false);
         }
     }, [newChatMode]);

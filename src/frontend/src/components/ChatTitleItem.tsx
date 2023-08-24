@@ -1,11 +1,8 @@
 import { useState, KeyboardEvent, useRef, useEffect } from 'react';
 import {
     Box,
-    BoxProps,
     Text,
-    TextProps,
     HStack,
-    StackProps,
     Flex,
     Input,
     InputGroup,
@@ -30,49 +27,10 @@ export default function ChatTitleItem(props: ChatTitleItemProps) {
     const [titleText, setTitleText] = useState(props.title);
     const chatTitleInputRef = useRef<HTMLInputElement>(null);
 
-    useEffect(() => {
-        if (chatTitleInputRef.current) {
-            console.log(chatTitleInputRef.current);
-            chatTitleInputRef.current.focus();
-        }
-    });
-
-    const chatTitleItemBoxProps: BoxProps = {
-        p: '1rem',
-        bg: useColorModeValue(
-            props.isActive ? 'gray.200' : 'white',
-            props.isActive ? 'black' : 'gray.800'
-        ),
-        _hover: {
-            bg: useColorModeValue(
-                props.isActive ? 'gray.200' : 'gray.100',
-                props.isActive ? 'black' : 'gray.900'
-            ),
-            cursor: 'pointer',
-        },
-        key: props.id,
-        onMouseLeave: () => {
-            setEditMode(0);
-        },
-        onClick: props.onSelect,
-    };
-    const chatTitleItemTextProps: TextProps = {
-        fontSize: 'lg',
-    };
-    const chatTitleItemActionButtonProps: StackProps = {
-        display: 'none',
-    };
-
-    if (props.isActive) {
-        delete chatTitleItemActionButtonProps.display;
-    }
-    if (isEditMode) {
-        delete chatTitleItemBoxProps.onClick;
-    }
-
     const openEditMode = () => {
         setEditMode(1);
     };
+
     const applyEditAction = (searchDOMInput?: boolean) => {
         if (searchDOMInput) {
             const currentText = document.querySelector(
@@ -83,6 +41,7 @@ export default function ChatTitleItem(props: ChatTitleItemProps) {
         }
         setEditMode(0);
     };
+
     const changeTitleText = (e: KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             setTitleText(e.currentTarget.value);
@@ -90,6 +49,12 @@ export default function ChatTitleItem(props: ChatTitleItemProps) {
             applyEditAction();
         }
     };
+
+    useEffect(() => {
+        if (chatTitleInputRef.current) {
+            chatTitleInputRef.current.focus();
+        }
+    });
 
     const InputMode = forwardRef((props, ref) => (
         <InputGroup size={'md'}>
@@ -114,7 +79,25 @@ export default function ChatTitleItem(props: ChatTitleItemProps) {
     ));
 
     return (
-        <Box {...chatTitleItemBoxProps}>
+        <Box
+            p={'1rem'}
+            bg={useColorModeValue(
+                props.isActive ? 'gray.200' : 'white',
+                props.isActive ? 'black' : 'gray.800'
+            )}
+            _hover={{
+                bg: useColorModeValue(
+                    props.isActive ? 'gray.200' : 'gray.100',
+                    props.isActive ? 'black' : 'gray.900'
+                ),
+                cursor: 'pointer',
+            }}
+            key={props.id}
+            onMouseLeave={() => {
+                setEditMode(0);
+            }}
+            onClick={isEditMode ? undefined : props.onSelect}
+        >
             {isEditMode ? (
                 <InputMode
                     ref={chatTitleInputRef}
@@ -125,13 +108,15 @@ export default function ChatTitleItem(props: ChatTitleItemProps) {
                 <Flex justifyContent={'space-between'}>
                     <HStack>
                         <ChatIcon></ChatIcon>
-                        <Text {...chatTitleItemTextProps}>
+                        <Text fontSize={'lg'}>
                             {titleText.length > 18
                                 ? titleText.slice(0, 18) + '...'
                                 : titleText}
                         </Text>
                     </HStack>
-                    <HStack {...chatTitleItemActionButtonProps}>
+                    <HStack
+                        style={{ display: props.isActive ? undefined : 'none' }}
+                    >
                         <Button onClick={openEditMode} size={'xs'}>
                             <EditIcon></EditIcon>
                         </Button>

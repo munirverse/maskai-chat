@@ -1,6 +1,5 @@
 import {
     Box,
-    BoxProps,
     Menu,
     MenuButton,
     MenuList,
@@ -16,13 +15,8 @@ import {
 } from '@chakra-ui/icons';
 
 export default function SidebarActionBottom() {
-    const sideBarActionBottomProps: BoxProps = {
-        bg: useColorModeValue('white', 'gray.900'),
-        p: '1rem',
-    };
-
     return (
-        <Box {...sideBarActionBottomProps}>
+        <Box bg={useColorModeValue('white', 'gray.900')} p={'1rem'}>
             <HStack>
                 <Menu>
                     <Button>

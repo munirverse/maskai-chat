@@ -9,7 +9,7 @@ import {
 } from '@chakra-ui/react';
 import { ArrowForwardIcon } from '@chakra-ui/icons';
 import { SidebarMobileContext, ChatContentContext } from '../Contexts';
-import { ChatLoadingState } from '../Interfaces';
+import { ChatLoadingState, ChatTitleItem } from '../Interfaces';
 import { MessageTextArea } from './MessageTextArea';
 import { MainContentDefault } from './MainContentDefault';
 import { MainContentSkeleton } from './MainContentSkeleton';
@@ -21,22 +21,35 @@ export default function MainContent() {
 
     // Chat Context
     // @ts-ignore
-    const { chatKey, chatLoadingState, chatTitleList, updateChatTitleList } =
-        useContext(ChatContentContext);
+    const {
+        // @ts-ignore
+        chatKey,
+        // @ts-ignore
+        chatLoadingState,
+        // @ts-ignore
+        chatTitleList,
+        // @ts-ignore
+        updateChatTitleList,
+        // @ts-ignore
+        updateChatLoadingState,
+    } = useContext(ChatContentContext);
 
     const submitMessage = (message: string) => {
         if (!chatKey && chatLoadingState === ChatLoadingState.NOT_INIT) {
             const uniqueId = new Date().getTime().toString(32);
             updateChatTitleList(
-                chatTitleList.concat([
-                    {
-                        id: uniqueId,
-                        title: message?.slice(0, 50),
-                        isActive: 1,
-                    },
-                ]),
+                chatTitleList
+                    .map((item: ChatTitleItem) => ({ ...item, isActive: null }))
+                    .concat([
+                        {
+                            id: uniqueId,
+                            title: message?.slice(0, 50),
+                            isActive: 1,
+                        },
+                    ]),
                 uniqueId
             );
+            updateChatLoadingState(ChatLoadingState.LOADING);
         }
         console.log(message);
     };
