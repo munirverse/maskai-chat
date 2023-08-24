@@ -1,22 +1,16 @@
-import { Flex } from '@chakra-ui/react';
-import DefaultLayout from './components/DefaultLayout';
-import Navbar from './components/Navbar';
-import Sidebar from './components/Sidebar';
-import MainContent from './components/MainContent';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import Home from './pages/Home';
 import './assets/custom.scss';
 
+const router = createBrowserRouter([
+    {
+        path: '/',
+        element: <Home />,
+    },
+]);
+
 function App() {
-    return (
-        <>
-            <DefaultLayout>
-                <Navbar></Navbar>
-                <Flex flex={'1'}>
-                    <Sidebar></Sidebar>
-                    <MainContent></MainContent>
-                </Flex>
-            </DefaultLayout>
-        </>
-    );
+    return <RouterProvider router={router}></RouterProvider>;
 }
 
 export default App;
