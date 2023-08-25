@@ -16,6 +16,12 @@ export interface DefaultProps {
     children?: ReactNode;
 }
 
+export type ModalCustomProps<T = object> = {
+    isOpen: boolean;
+    onClose: () => void;
+} & DefaultProps &
+    T;
+
 export const ChatLoadingState = {
     NOT_INIT: 'notinit',
     LOADING: 'loading',
@@ -30,4 +36,10 @@ export interface ChatContent {
         | typeof ChatLoadingState.NOT_INIT
         | typeof ChatLoadingState.LOADING
         | typeof ChatLoadingState.ACTIVE;
+}
+
+export interface ChatConfiguration {
+    apiKey: string;
+    model: string;
+    backupMode: boolean;
 }

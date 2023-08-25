@@ -7,13 +7,6 @@ import {
     MenuItem,
     Button,
     HStack,
-    Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalFooter,
-    ModalHeader,
-    ModalBody,
-    ModalCloseButton,
     useColorModeValue,
     useDisclosure,
 } from '@chakra-ui/react';
@@ -24,6 +17,8 @@ import {
 } from '@chakra-ui/icons';
 import { ChatContentContext } from '../Contexts';
 import { ChatLoadingState } from '../Interfaces';
+import ModalConfigClearChat from './ModalConfigClearChat';
+import ModalConfigApiKey from './ModalConfigApiKey';
 
 export default function SidebarActionBottom() {
     // Chat Context
@@ -48,7 +43,18 @@ export default function SidebarActionBottom() {
     };
 
     // Modal Confirmation Clear All Chat State
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const {
+        isOpen: isOpenClearChatModal,
+        onOpen: onOpenClearChatModal,
+        onClose: onCloseClearChatModal,
+    } = useDisclosure();
+
+    // Modal Api Key State
+    const {
+        isOpen: isOpenApiKeyModal,
+        onOpen: onOpenApiKeyModal,
+        onClose: onCloseApiKeyModal,
+    } = useDisclosure();
 
     return (
         <Box bg={useColorModeValue('white', 'gray.900')} p={'1rem'}>
@@ -65,36 +71,28 @@ export default function SidebarActionBottom() {
                         Configuration
                     </MenuButton>
                     <MenuList>
-                        <MenuItem>API Keys</MenuItem>
+                        <MenuItem onClick={onOpenApiKeyModal}>
+                            API Keys
+                        </MenuItem>
                         <MenuItem>AI Models</MenuItem>
-                        <MenuItem onClick={onOpen}>Clear All Chat</MenuItem>
+                        <MenuItem onClick={onOpenClearChatModal}>
+                            Clear All Chat
+                        </MenuItem>
                         <MenuItem icon={<WarningTwoIcon />} isDisabled={true}>
                             Backup Conversation
                         </MenuItem>
                     </MenuList>
                 </Menu>
             </HStack>
-            <Modal isOpen={isOpen} onClose={onClose}>
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>Are you sure to clear all chat?</ModalHeader>
-                    <ModalCloseButton></ModalCloseButton>
-                    <ModalBody>
-                        all chat will be delete after this action
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button
-                            colorScheme="green"
-                            onClick={() => handleClearAllChat(onClose)}
-                        >
-                            OK
-                        </Button>
-                        <Button variant={'ghost'} onClick={onClose}>
-                            Cancel
-                        </Button>
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>
+            <ModalConfigClearChat
+                isOpen={isOpenClearChatModal}
+                onClose={onCloseClearChatModal}
+                confirmClearAllChat={handleClearAllChat}
+            ></ModalConfigClearChat>
+            <ModalConfigApiKey
+                isOpen={isOpenApiKeyModal}
+                onClose={onCloseApiKeyModal}
+            ></ModalConfigApiKey>
         </Box>
     );
 }

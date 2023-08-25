@@ -48,16 +48,23 @@ export default function Sidebar() {
 
     // Sidebar Mobile Context
     // @ts-ignore
-    const [isActiveSidebarMobile] = useContext(SidebarMobileContext);
+    const [isActiveSidebarMobile, setActiveSidebarMobile] =
+        useContext(SidebarMobileContext);
 
     useEffect(() => {
         if (newChatMode) {
             const textAreaId = '#chatMessageTextArea';
             document.querySelector<HTMLTextAreaElement>(textAreaId)!.focus();
             document.querySelector<HTMLTextAreaElement>(textAreaId)!.value = '';
+            if (!isDekstopView) setActiveSidebarMobile(!isActiveSidebarMobile);
             setNewChatMode(false);
         }
-    }, [newChatMode]);
+    }, [
+        newChatMode,
+        isActiveSidebarMobile,
+        setActiveSidebarMobile,
+        isDekstopView,
+    ]);
 
     return (
         <Box
