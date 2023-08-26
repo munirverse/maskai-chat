@@ -6,22 +6,31 @@ import {
     ChatContent,
     ChatLoadingState,
     ChatTitleItem,
+    ChatConfiguration,
 } from '../Interfaces';
 
-export default function DefaultLayout({ children }: DefaultProps) {
+export default function HomeLayout({ children }: DefaultProps) {
     // Chat Context
     const storedChatTitleList = localStorage.getItem('chatTitleList');
+    const storedApiKey = localStorage.getItem('apiKey');
 
     const [chatTitleList, setChaTitleList] = useState<
         ChatContent['chatTitleList']
     >(storedChatTitleList ? JSON.parse(storedChatTitleList) : []);
+
     const [chatConversation, setChatConversation] = useState<
         ChatContent['chatActiveConversation']
     >([]);
+
     const [chatKey, setChatKey] = useState<ChatContent['chatActiveKey']>('');
+
     const [chatLoadingState, setChatLoadingState] = useState<
         ChatContent['chatLoadingState']
     >(ChatLoadingState.NOT_INIT);
+
+    const [apiKey, setApiKey] = useState<ChatConfiguration['apiKey']>(
+        storedApiKey || ''
+    );
 
     const chatContentContextValue = {
         chatTitleList,
@@ -40,6 +49,11 @@ export default function DefaultLayout({ children }: DefaultProps) {
         updateChatKey: setChatKey,
         chatLoadingState,
         updateChatLoadingState: setChatLoadingState,
+        apiKey,
+        setApiKey: (apiKeyData: string) => {
+            setApiKey(apiKeyData);
+            localStorage.setItem('apiKey', apiKeyData);
+        },
     };
 
     // Sidebar Mobile Context
