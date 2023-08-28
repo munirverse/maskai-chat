@@ -18,6 +18,7 @@ import {
     InputGroup,
     Input,
     InputRightElement,
+    useColorModeValue,
 } from '@chakra-ui/react';
 import { EditIcon } from '@chakra-ui/icons';
 import { ChatContentContext } from '../Contexts';
@@ -26,7 +27,7 @@ import { ModalCustomProps } from '../Interfaces';
 function ModalConfigApiKey(props: ModalCustomProps) {
     // Chat Context
     // @ts-ignore
-    const { apiKey, setApiKey } = useContext(ChatContentContext);
+    const { apiKey, updateApiKey } = useContext(ChatContentContext);
 
     // @ts-ignore
     const [apiKeyEditMode, setApiKeyEditMode] = useState(false);
@@ -35,7 +36,7 @@ function ModalConfigApiKey(props: ModalCustomProps) {
     const [tempApiKey, setTempApiKey] = useState('');
 
     const handleSaveApiKey = () => {
-        setApiKey(tempApiKey);
+        updateApiKey(tempApiKey);
         setApiKeyEditMode(false);
     };
 
@@ -83,6 +84,10 @@ function ModalConfigApiKey(props: ModalCustomProps) {
                                 onKeyUp={handleEnterApiKey}
                                 placeholder="insert your api key here"
                                 autoFocus={true}
+                                focusBorderColor={useColorModeValue(
+                                    'green.400',
+                                    'green.400'
+                                )}
                             ></Input>
                         </InputGroup>
                         <InputGroup
@@ -90,7 +95,14 @@ function ModalConfigApiKey(props: ModalCustomProps) {
                                 display: !apiKeyEditMode ? undefined : 'none',
                             }}
                         >
-                            <Input value={apiKey} isReadOnly></Input>
+                            <Input
+                                value={apiKey}
+                                isReadOnly
+                                focusBorderColor={useColorModeValue(
+                                    'green.400',
+                                    'green.400'
+                                )}
+                            ></Input>
                             <InputRightElement>
                                 <Button onClick={handleActiveEditMode}>
                                     <EditIcon></EditIcon>
