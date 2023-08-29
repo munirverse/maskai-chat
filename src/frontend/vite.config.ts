@@ -11,5 +11,6 @@ export default () => {
     return defineConfig({
         plugins: [react()],
         server: { port: parseInt(process.env.FE_PORT) },
+        envPrefix: 'FE_',
     });
 };
