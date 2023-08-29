@@ -42,7 +42,7 @@ export default function HomeLayout({ children }: DefaultProps) {
         const headers = new Headers();
         headers.append('Authorization', `Bearer ${apiKey}`);
 
-        return fetch('http://localhost:4300/api/openai/models', {
+        return fetch(`${import.meta.env.FE_BASE_API_URL}/openai/models`, {
             headers,
         })
             .then((data) => data.json())
