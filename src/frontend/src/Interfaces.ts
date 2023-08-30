@@ -28,6 +28,11 @@ export const ChatLoadingState = {
     ACTIVE: 'active',
 } as const;
 
+export interface ModelGPTListItem {
+    name: string;
+    isActive: boolean | undefined;
+}
+
 export interface ChatContent {
     chatTitleList: ChatTitleItem[] | [];
     chatActiveConversation: unknown[];
@@ -41,5 +46,6 @@ export interface ChatContent {
 export interface ChatConfiguration {
     apiKey: string;
     model: string;
+    modelList: ModelGPTListItem[] | [];
     backupMode: boolean;
 }

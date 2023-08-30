@@ -7,6 +7,7 @@ import {
     ChatLoadingState,
     ChatTitleItem,
     ChatConfiguration,
+    ModelGPTListItem,
 } from '../Interfaces';
 
 export default function HomeLayout({ children }: DefaultProps) {
@@ -36,6 +37,10 @@ export default function HomeLayout({ children }: DefaultProps) {
     const [modelGPT, setModelGPT] = useState<ChatConfiguration['model']>(
         storedModelGPT || ''
     );
+
+    const [modelGPTList, setModelGPTList] = useState<
+        ChatConfiguration['modelList']
+    >([]);
 
     // Shared functions
     const getModelGPTList = async (apiKey: string) => {
@@ -78,9 +83,8 @@ export default function HomeLayout({ children }: DefaultProps) {
             setModelGPT(modelGPTData);
             localStorage.setItem('modelGPT', modelGPTData);
         },
-        sharedFunctions: {
-            getModelGPTList,
-        },
+        modelGPTList,
+        updateModelGPTList: setModelGPTList,
     };
 
     // Sidebar Mobile Context
@@ -94,12 +98,20 @@ export default function HomeLayout({ children }: DefaultProps) {
 
     useEffect(() => {
         (async () => {
-            if (!modelGPT && apiKey) {
+            if (apiKey && !modelGPTList.length) {
                 const rawModelGPTList = await getModelGPTList(apiKey);
-                setModelGPT(rawModelGPTList?.data?.[0] || '');
+                if (!modelGPT) setModelGPT(rawModelGPTList?.data?.[0] || '');
+                setModelGPTList(
+                    rawModelGPTList?.data?.map(
+                        (item: string): ModelGPTListItem => ({
+                            name: item,
+                            isActive: item === modelGPT ? true : undefined,
+                        })
+                    ) || []
+                );
             }
         })();
-    }, [modelGPT, setModelGPT, apiKey]);
+    }, [modelGPT, setModelGPT, apiKey, setModelGPTList, modelGPTList]);
 
     return (
         <ChatContentContext.Provider value={chatContentContextValue}>

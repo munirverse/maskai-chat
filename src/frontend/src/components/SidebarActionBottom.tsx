@@ -19,6 +19,7 @@ import { ChatContentContext } from '../Contexts';
 import { ChatLoadingState } from '../Interfaces';
 import ModalConfigClearChat from './ModalConfigClearChat';
 import ModalConfigApiKey from './ModalConfigApiKey';
+import ModalConfigModelGPT from './ModalConfigModelGPT';
 
 export default function SidebarActionBottom() {
     // Chat Context
@@ -56,6 +57,13 @@ export default function SidebarActionBottom() {
         onClose: onCloseApiKeyModal,
     } = useDisclosure();
 
+    // Modal Model GPT State
+    const {
+        isOpen: isOpenModelGPTModal,
+        onOpen: onOpenModelGPTModal,
+        onClose: onCloseModelGPTModal,
+    } = useDisclosure();
+
     return (
         <Box bg={useColorModeValue('white', 'gray.900')} p={'1rem'}>
             <HStack>
@@ -74,7 +82,9 @@ export default function SidebarActionBottom() {
                         <MenuItem onClick={onOpenApiKeyModal}>
                             API Keys
                         </MenuItem>
-                        <MenuItem>AI Models</MenuItem>
+                        <MenuItem onClick={onOpenModelGPTModal}>
+                            AI Models
+                        </MenuItem>
                         <MenuItem onClick={onOpenClearChatModal}>
                             Clear All Chat
                         </MenuItem>
@@ -93,6 +103,10 @@ export default function SidebarActionBottom() {
                 isOpen={isOpenApiKeyModal}
                 onClose={onCloseApiKeyModal}
             ></ModalConfigApiKey>
+            <ModalConfigModelGPT
+                isOpen={isOpenModelGPTModal}
+                onClose={onCloseModelGPTModal}
+            ></ModalConfigModelGPT>
         </Box>
     );
 }
