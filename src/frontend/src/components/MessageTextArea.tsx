@@ -1,4 +1,4 @@
-import { KeyboardEvent, useState } from 'react';
+import { KeyboardEvent, useImperativeHandle, useState } from 'react';
 import { Textarea, forwardRef, useColorModeValue } from '@chakra-ui/react';
 import ResizeTextArea from 'react-textarea-autosize';
 
@@ -6,7 +6,7 @@ export const MessageTextArea = forwardRef((props, ref) => {
     const [messageText, setMessageText] = useState('');
 
     const handleTextAreaSubmit = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
+        if (e.key === 'Enter' && !e.shiftKey && messageText.trim()) {
             props.onSubmit(messageText);
             setMessageText('');
             e.preventDefault();
@@ -16,6 +16,12 @@ export const MessageTextArea = forwardRef((props, ref) => {
     const handleOnChange = (e) => {
         setMessageText(e.target.value);
     };
+
+    useImperativeHandle(ref, () => ({
+        clearTextArea: () => {
+            setMessageText('');
+        },
+    }));
 
     return (
         <Textarea

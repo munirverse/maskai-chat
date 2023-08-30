@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useRef } from 'react';
 import {
     Box,
     Flex,
@@ -34,7 +34,19 @@ export default function MainContent() {
         updateChatLoadingState,
     } = useContext(ChatContentContext);
 
-    const submitMessage = (message: string) => {
+    const textAreaRef = useRef();
+
+    const submitMessage = (message?: string) => {
+        if (!message) {
+            const messageElement = document.querySelector<HTMLTextAreaElement>(
+                '#chatMessageTextArea'
+            )!;
+            message = messageElement.value;
+            if (!message.trim()) return;
+            // @ts-ignore
+            textAreaRef.current.clearTextArea();
+        }
+
         if (!chatKey && chatLoadingState === ChatLoadingState.NOT_INIT) {
             const uniqueId = new Date().getTime().toString(32);
             updateChatTitleList(
@@ -72,13 +84,13 @@ export default function MainContent() {
             bg={useColorModeValue('gray.200', 'gray.700')}
             style={{ display: isActiveSidebarMobile ? 'none' : undefined }}
         >
-            <Flex flexDirection={'column'} h={'full'}>
+            <Flex flexDirection={'column'} h={'full'} position={'relative'}>
                 <Box flexGrow={'1'}>
                     <Box
                         m={'0 auto'}
                         w={'full'}
                         p={'2rem'}
-                        maxH={'calc(100vh - 120px - 64px)'}
+                        maxH={'calc(100vh - 64px - 100px)'}
                         overflow={'scroll'}
                     >
                         <MainContentDisplayRender></MainContentDisplayRender>
@@ -92,9 +104,12 @@ export default function MainContent() {
                         'linear(to-b, transparent, gray.200, gray.300, gray.400)',
                         'linear(to-b, transparent, gray.700, gray.800, gray.900)'
                     )}
+                    position={'absolute'}
+                    bottom={0}
                 >
                     <InputGroup>
                         <MessageTextArea
+                            ref={textAreaRef}
                             onSubmit={submitMessage}
                         ></MessageTextArea>
                         <InputRightElement>
@@ -102,6 +117,13 @@ export default function MainContent() {
                                 mr={'1rem'}
                                 mt={'1rem'}
                                 colorScheme={'green'}
+                                onClick={() => submitMessage()}
+                                isLoading={
+                                    chatLoadingState ===
+                                    ChatLoadingState.LOADING
+                                        ? true
+                                        : undefined
+                                }
                             >
                                 <ArrowForwardIcon></ArrowForwardIcon>
                             </Button>
