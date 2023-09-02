@@ -5,9 +5,9 @@ import {
     DefaultProps,
     ChatContent,
     ChatLoadingState,
-    ChatTitleItem,
     ChatConfiguration,
     ModelGPTListItem,
+    ChatContentContextValues,
 } from '../Interfaces';
 
 export default function HomeLayout({ children }: DefaultProps) {
@@ -42,8 +42,8 @@ export default function HomeLayout({ children }: DefaultProps) {
         ChatConfiguration['modelList']
     >([]);
 
-    // Shared functions
-    const getModelGPTList = async (apiKey: string) => {
+    // async functions
+    const getModelGPTList = (apiKey: string) => {
         const headers = new Headers();
         headers.append('Authorization', `Bearer ${apiKey}`);
 
@@ -56,35 +56,117 @@ export default function HomeLayout({ children }: DefaultProps) {
             });
     };
 
-    const chatContentContextValue = {
-        chatTitleList,
-        updateChatTitleList: (chatTitleListData: ChatTitleItem[]) => {
-            setChaTitleList(chatTitleListData);
-            localStorage.setItem(
-                'chatTitleList',
-                JSON.stringify(chatTitleListData)
-            );
+    const getStreamingAnswer = (
+        apiKey: string,
+        model: string,
+        messages: ChatContent['chatActiveConversation']
+    ) => {
+        const myHeaders = new Headers();
+        myHeaders.append('Content-Type', 'application/json');
+        myHeaders.append('Authorization', `Bearer ${apiKey}`);
+
+        const rawPayload = JSON.stringify({ model, messages });
+
+        const requestOpts: RequestInit = {
+            method: 'POST',
+            headers: myHeaders,
+            body: rawPayload,
+            redirect: 'follow',
+        };
+
+        return fetch(
+            `${import.meta.env.FE_BASE_API_URL}/openai/answer`,
+            requestOpts
+        );
+    };
+
+    const chatContentContextValue: ChatContentContextValues = {
+        chat: {
+            titleList: {
+                get: () => chatTitleList,
+                set: (chatTitleListData: ChatContent['chatTitleList']) => {
+                    setChaTitleList(chatTitleListData);
+                    localStorage.setItem(
+                        'chatTitleList',
+                        JSON.stringify(chatTitleListData)
+                    );
+                },
+            },
+            conversation: {
+                get: () => chatConversation,
+                set: (
+                    chatConversationData: ChatContent['chatActiveConversation'],
+                    keyId?: string,
+                    writeOnLocalStorage?: boolean
+                ) => {
+                    setChatConversation(chatConversationData);
+                    if (writeOnLocalStorage) {
+                        localStorage.setItem(
+                            `${keyId}-conversation`,
+                            JSON.stringify(chatConversationData)
+                        );
+                    }
+                },
+                delete: (chatKey: string) => {
+                    if (chatConversation.length) setChatConversation([]);
+                    localStorage.removeItem(`${chatKey}-conversation`);
+                },
+                reload: (keyId: string) => {
+                    const conversationKey = `${keyId}-conversation`;
+                    if (localStorage.getItem(conversationKey)) {
+                        setChatConversation(
+                            JSON.parse(
+                                localStorage.getItem(conversationKey) as string
+                            )
+                        );
+                    }
+                },
+                clear: () => {
+                    for (const key in localStorage) {
+                        if (key.endsWith('-conversation')) {
+                            localStorage.removeItem(key);
+                        }
+                    }
+                    if (chatConversation.length) setChatConversation([]);
+                },
+            },
+            activeKey: {
+                get: () => chatKey,
+                set: (chatKeyData: string) => {
+                    setChatKey(chatKeyData);
+                },
+            },
+            loadingState: {
+                get: () => chatLoadingState,
+                set: (
+                    chatLoadingStateData: ChatContent['chatLoadingState']
+                ) => {
+                    setChatLoadingState(chatLoadingStateData);
+                },
+            },
         },
-        chatConversation,
-        updateChatConversation: (chatConversationData: unknown[]) => {
-            setChatConversation(chatConversationData);
+        config: {
+            model: {
+                get: () => modelGPT,
+                set: (modelData: string) => {
+                    setModelGPT(modelData);
+                    localStorage.setItem('modelGPT', modelData);
+                },
+            },
+            modelList: {
+                get: () => modelGPTList,
+                set: (modelList: ChatConfiguration['modelList']) => {
+                    setModelGPTList(modelList);
+                },
+            },
+            apiKey: {
+                get: () => apiKey,
+                set: (apiKeyData: string) => {
+                    setApiKey(apiKeyData);
+                    localStorage.setItem('apiKey', apiKeyData);
+                },
+            },
         },
-        chatKey,
-        updateChatKey: setChatKey,
-        chatLoadingState,
-        updateChatLoadingState: setChatLoadingState,
-        apiKey,
-        updateApiKey: (apiKeyData: string) => {
-            setApiKey(apiKeyData);
-            localStorage.setItem('apiKey', apiKeyData);
-        },
-        modelGPT,
-        updateModelGPT: (modelGPTData: string) => {
-            setModelGPT(modelGPTData);
-            localStorage.setItem('modelGPT', modelGPTData);
-        },
-        modelGPTList,
-        updateModelGPTList: setModelGPTList,
     };
 
     // Sidebar Mobile Context
@@ -110,8 +192,53 @@ export default function HomeLayout({ children }: DefaultProps) {
                     ) || []
                 );
             }
+
+            if (chatLoadingState === ChatLoadingState.LOADING) {
+                console.log('loading...');
+                const responseAnswer = await getStreamingAnswer(
+                    apiKey,
+                    modelGPT,
+                    chatConversation
+                );
+                const readerAnswer = responseAnswer.body?.getReader();
+                const decodeAnswer = new TextDecoder('utf-8');
+                /* eslint-disable */
+                while (true) {
+                    // @ts-ignore
+                    const { value, done } = await readerAnswer?.read();
+                    if (done) {
+                        chatContentContextValue.chat.conversation.set(
+                            chatConversation.slice().concat([
+                                {
+                                    role: 'assistant',
+                                    content:
+                                        document.querySelector(
+                                            '#loadingAnswerChat'
+                                        )!.innerHTML,
+                                },
+                            ]),
+                            chatKey,
+                            true
+                        );
+                        setChatLoadingState(ChatLoadingState.ACTIVE);
+                        break;
+                    }
+
+                    document.querySelector<HTMLElement>(
+                        '#loadingAnswerChat'
+                    )!.innerHTML += decodeAnswer.decode(value);
+                }
+            }
         })();
-    }, [modelGPT, setModelGPT, apiKey, setModelGPTList, modelGPTList]);
+    }, [
+        modelGPT,
+        setModelGPT,
+        apiKey,
+        setModelGPTList,
+        modelGPTList,
+        chatLoadingState,
+        setChatLoadingState,
+    ]);
 
     return (
         <ChatContentContext.Provider value={chatContentContextValue}>

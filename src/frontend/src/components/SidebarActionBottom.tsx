@@ -16,30 +16,20 @@ import {
     WarningTwoIcon,
 } from '@chakra-ui/icons';
 import { ChatContentContext } from '../Contexts';
-import { ChatLoadingState } from '../Interfaces';
+import { ChatLoadingState, ChatContentContextValues } from '../Interfaces';
 import ModalConfigClearChat from './ModalConfigClearChat';
 import ModalConfigApiKey from './ModalConfigApiKey';
 import ModalConfigModelGPT from './ModalConfigModelGPT';
 
 export default function SidebarActionBottom() {
     // Chat Context
-    // @ts-ignore
-    const {
-        // @ts-ignore
-        updateChatTitleList,
-        // @ts-ignore
-        updateChatLoadingState,
-        // @ts-ignore
-        updateChatConversation,
-        // @ts-ignore
-        updateChatKey,
-    } = useContext(ChatContentContext);
+    const { chat } = useContext(ChatContentContext) as ChatContentContextValues;
 
     const handleClearAllChat = (onClose: () => void) => {
-        updateChatTitleList([]);
-        updateChatLoadingState(ChatLoadingState.NOT_INIT);
-        updateChatConversation([]);
-        updateChatKey('');
+        chat.titleList.set([]);
+        chat.loadingState.set(ChatLoadingState.NOT_INIT);
+        chat.activeKey.set('');
+        chat.conversation.clear();
         onClose();
     };
 

@@ -22,12 +22,13 @@ import {
 } from '@chakra-ui/react';
 import { EditIcon } from '@chakra-ui/icons';
 import { ChatContentContext } from '../Contexts';
-import { ModalCustomProps } from '../Interfaces';
+import { ModalCustomProps, ChatContentContextValues } from '../Interfaces';
 
 function ModalConfigApiKey(props: ModalCustomProps) {
     // Chat Context
-    // @ts-ignore
-    const { apiKey, updateApiKey } = useContext(ChatContentContext);
+    const { config } = useContext(
+        ChatContentContext
+    ) as ChatContentContextValues;
 
     // @ts-ignore
     const [apiKeyEditMode, setApiKeyEditMode] = useState(false);
@@ -36,7 +37,7 @@ function ModalConfigApiKey(props: ModalCustomProps) {
     const [tempApiKey, setTempApiKey] = useState('');
 
     const handleSaveApiKey = () => {
-        updateApiKey(tempApiKey);
+        config.apiKey.set(tempApiKey);
         setApiKeyEditMode(false);
     };
 
@@ -54,17 +55,23 @@ function ModalConfigApiKey(props: ModalCustomProps) {
         setApiKeyEditMode(true);
     };
 
+    const handleOnClose = () => {
+        setApiKeyEditMode(false);
+        if (!tempApiKey) setTempApiKey(config.apiKey.get());
+        props.onClose();
+    };
+
     useEffect(() => {
         if (apiKeyEditMode) {
-            setTempApiKey(apiKey);
+            setTempApiKey(config.apiKey.get());
             document
                 .querySelector<HTMLInputElement>('input#inputApiKey')
                 ?.focus();
         }
-    }, [setTempApiKey, apiKey, apiKeyEditMode]);
+    }, [setTempApiKey, config.apiKey, apiKeyEditMode]);
 
     return (
-        <Modal isOpen={props.isOpen} onClose={props.onClose}>
+        <Modal isOpen={props.isOpen} onClose={handleOnClose}>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>API Keys</ModalHeader>
@@ -96,7 +103,7 @@ function ModalConfigApiKey(props: ModalCustomProps) {
                             }}
                         >
                             <Input
-                                value={apiKey}
+                                value={config.apiKey.get()}
                                 isReadOnly
                                 focusBorderColor={useColorModeValue(
                                     'green.400',
@@ -113,13 +120,13 @@ function ModalConfigApiKey(props: ModalCustomProps) {
                 </ModalBody>
                 <ModalFooter>
                     <Button
-                        isDisabled={apiKey && apiKeyEditMode ? false : true}
+                        isDisabled={tempApiKey && apiKeyEditMode ? false : true}
                         colorScheme={'green'}
                         onClick={handleSaveApiKey}
                     >
                         Save
                     </Button>
-                    <Button variant={'ghost'} onClick={props.onClose}>
+                    <Button variant={'ghost'} onClick={handleOnClose}>
                         Close
                     </Button>
                 </ModalFooter>

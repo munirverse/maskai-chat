@@ -9,10 +9,14 @@ import {
 } from '@chakra-ui/react';
 import { ArrowForwardIcon } from '@chakra-ui/icons';
 import { SidebarMobileContext, ChatContentContext } from '../Contexts';
-import { ChatLoadingState, ChatTitleItem } from '../Interfaces';
+import {
+    ChatContentContextValues,
+    ChatLoadingState,
+    ChatTitleItem,
+} from '../Interfaces';
 import { MessageTextArea } from './MessageTextArea';
 import { MainContentDefault } from './MainContentDefault';
-import { MainContentSkeleton } from './MainContentSkeleton';
+import { MainContentMessage } from './MainContentMessage';
 
 export default function MainContent() {
     // Sidebar Mobile Context
@@ -20,19 +24,7 @@ export default function MainContent() {
     const [isActiveSidebarMobile] = useContext(SidebarMobileContext);
 
     // Chat Context
-    // @ts-ignore
-    const {
-        // @ts-ignore
-        chatKey,
-        // @ts-ignore
-        chatLoadingState,
-        // @ts-ignore
-        chatTitleList,
-        // @ts-ignore
-        updateChatTitleList,
-        // @ts-ignore
-        updateChatLoadingState,
-    } = useContext(ChatContentContext);
+    const { chat } = useContext(ChatContentContext) as ChatContentContextValues;
 
     const textAreaRef = useRef();
 
@@ -47,49 +39,64 @@ export default function MainContent() {
             textAreaRef.current.clearTextArea();
         }
 
-        if (!chatKey && chatLoadingState === ChatLoadingState.NOT_INIT) {
+        if (
+            !chat.activeKey.get() &&
+            chat.loadingState.get() === ChatLoadingState.NOT_INIT
+        ) {
             const uniqueId = new Date().getTime().toString(32);
-            updateChatTitleList(
-                chatTitleList
-                    .map((item: ChatTitleItem) => ({ ...item, isActive: null }))
+            chat.titleList.set(
+                chat.titleList
+                    .get()
+                    .map(
+                        (item): ChatTitleItem => ({
+                            ...item,
+                            isActive: undefined,
+                        })
+                    )
                     .concat([
                         {
                             id: uniqueId,
                             title: message?.slice(0, 50),
                             isActive: 1,
                         },
-                    ]),
-                uniqueId
+                    ])
             );
-            updateChatLoadingState(ChatLoadingState.LOADING);
+            chat.activeKey.set(uniqueId);
+            chat.loadingState.set(ChatLoadingState.LOADING);
+            chat.conversation.set(
+                chat.conversation
+                    .get()
+                    .slice()
+                    .concat([{ role: 'user', content: message }]),
+                uniqueId,
+                true
+            );
         }
-        console.log(message);
     };
 
     const mainContentDisplay = {
         [ChatLoadingState.NOT_INIT]: () => <MainContentDefault />,
-        [ChatLoadingState.LOADING]: () => <MainContentSkeleton />,
-        [ChatLoadingState.ACTIVE]: () => <MainContent />,
+        [ChatLoadingState.LOADING]: () => <MainContentMessage />,
+        [ChatLoadingState.ACTIVE]: () => <MainContentMessage />,
     };
 
     // @ts-ignore
     const MainContentDisplayRender =
         // @ts-ignore
-        mainContentDisplay[chatLoadingState];
+        mainContentDisplay[chat.loadingState.get()];
 
     return (
         <Box
             h={'full'}
-            flexGrow={1}
             bg={useColorModeValue('gray.200', 'gray.700')}
             style={{ display: isActiveSidebarMobile ? 'none' : undefined }}
+            w={'full'}
         >
             <Flex flexDirection={'column'} h={'full'} position={'relative'}>
-                <Box flexGrow={'1'}>
+                <Box>
                     <Box
                         m={'0 auto'}
                         w={'full'}
-                        p={'2rem'}
                         maxH={'calc(100vh - 64px - 100px)'}
                         overflow={'scroll'}
                     >
@@ -99,7 +106,8 @@ export default function MainContent() {
                 <Box
                     minH={'120px'}
                     w={'full'}
-                    p={'2rem'}
+                    px={'2rem'}
+                    pt={'2.5rem'}
                     bgGradient={useColorModeValue(
                         'linear(to-b, transparent, gray.200, gray.300, gray.400)',
                         'linear(to-b, transparent, gray.700, gray.800, gray.900)'
@@ -119,7 +127,7 @@ export default function MainContent() {
                                 colorScheme={'green'}
                                 onClick={() => submitMessage()}
                                 isLoading={
-                                    chatLoadingState ===
+                                    chat.loadingState.get() ===
                                     ChatLoadingState.LOADING
                                         ? true
                                         : undefined

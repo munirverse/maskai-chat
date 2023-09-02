@@ -14,33 +14,22 @@ import {
     Button,
 } from '@chakra-ui/react';
 import { ChatContentContext } from '../Contexts';
-import {
-    ChatTitleItem as iChatTitleItem,
-    ChatLoadingState,
-} from '../Interfaces';
+import { ChatLoadingState, ChatContentContextValues } from '../Interfaces';
 import ChatTitleItem from './ChatTitleItem';
 
 export default function ChatTitleItems() {
     // Chat Context
-    const {
-        // @ts-ignore
-        chatTitleList,
-        // @ts-ignore
-        updateChatTitleList,
-        // @ts-ignore
-        updateChatKey,
-        // @ts-ignore
-        updateChatLoadingState,
-        // @ts-ignore
-        updateChatConversation,
-    } = useContext(ChatContentContext);
+    const { chat } = useContext(ChatContentContext) as ChatContentContextValues;
 
     const activeChatTitleItem = () =>
-        chatTitleList.filter((item: iChatTitleItem) => item.isActive).at(0);
+        chat.titleList
+            .get()
+            .filter((item) => item.isActive)
+            .at(0);
 
     const handleChangeActiveTitleItem = (indexId: string) => {
-        updateChatTitleList(
-            chatTitleList.map((item: iChatTitleItem) => {
+        chat.titleList.set(
+            chat.titleList.get().map((item) => {
                 if (item.isActive && item.id !== indexId) {
                     delete item.isActive;
                 }
@@ -49,19 +38,17 @@ export default function ChatTitleItems() {
                 }
 
                 return item;
-            }),
-            indexId
+            })
         );
-        updateChatLoadingState(ChatLoadingState.LOADING);
+        chat.activeKey.set(indexId);
+        chat.conversation.reload(indexId);
+        chat.loadingState.set(ChatLoadingState.ACTIVE);
     };
 
     const handleChatItemDelete = (indexId: string | undefined) => {
         if (indexId) {
-            updateChatTitleList(
-                chatTitleList.filter(
-                    (item: iChatTitleItem) => item.id !== indexId
-                ),
-                ''
+            chat.titleList.set(
+                chat.titleList.get().filter((item) => item.id !== indexId)
             );
         }
     };
@@ -70,8 +57,8 @@ export default function ChatTitleItems() {
         indexId: string,
         currentTextValue: string
     ) => {
-        updateChatTitleList(
-            chatTitleList.map((item: iChatTitleItem) => {
+        chat.titleList.set(
+            chat.titleList.get().map((item) => {
                 if (item.id === indexId) {
                     item.title = currentTextValue;
                 }
@@ -87,11 +74,13 @@ export default function ChatTitleItems() {
         indexId: string | undefined,
         handleModalClose: () => void
     ) => {
-        handleChatItemDelete(indexId);
-        handleModalClose();
-        updateChatKey('');
-        updateChatLoadingState(ChatLoadingState.NOT_INIT);
-        updateChatConversation([]);
+        if (indexId) {
+            handleChatItemDelete(indexId);
+            handleModalClose();
+            chat.activeKey.set('');
+            chat.loadingState.set(ChatLoadingState.NOT_INIT);
+            chat.conversation.delete(indexId);
+        }
     };
 
     return (
@@ -103,10 +92,11 @@ export default function ChatTitleItems() {
         >
             <Flex flexDirection={'column'}>
                 <Stack spacing={0}>
-                    {chatTitleList
+                    {chat.titleList
+                        .get()
                         .slice()
                         .reverse()
-                        .map((item: iChatTitleItem) => (
+                        .map((item) => (
                             <ChatTitleItem
                                 key={item.id}
                                 id={item.id}
