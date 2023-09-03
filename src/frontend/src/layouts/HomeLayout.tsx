@@ -42,6 +42,9 @@ export default function HomeLayout({ children }: DefaultProps) {
         ChatConfiguration['modelList']
     >([]);
 
+    const [streamingAnswer, setStreamingAnswer] =
+        useState<ChatContent['chatStreamingAnswer']>('');
+
     // async functions
     const getModelGPTList = (apiKey: string) => {
         const headers = new Headers();
@@ -144,6 +147,12 @@ export default function HomeLayout({ children }: DefaultProps) {
                     setChatLoadingState(chatLoadingStateData);
                 },
             },
+            streamingAnswer: {
+                get: () => streamingAnswer,
+                set: (streamingAnswerData: string) => {
+                    setStreamingAnswer(streamingAnswerData);
+                },
+            },
         },
         config: {
             model: {
@@ -194,7 +203,6 @@ export default function HomeLayout({ children }: DefaultProps) {
             }
 
             if (chatLoadingState === ChatLoadingState.LOADING) {
-                console.log('loading...');
                 const responseAnswer = await getStreamingAnswer(
                     apiKey,
                     modelGPT,
@@ -202,6 +210,7 @@ export default function HomeLayout({ children }: DefaultProps) {
                 );
                 const readerAnswer = responseAnswer.body?.getReader();
                 const decodeAnswer = new TextDecoder('utf-8');
+                let answer = '';
                 /* eslint-disable */
                 while (true) {
                     // @ts-ignore
@@ -211,22 +220,18 @@ export default function HomeLayout({ children }: DefaultProps) {
                             chatConversation.slice().concat([
                                 {
                                     role: 'assistant',
-                                    content:
-                                        document.querySelector(
-                                            '#loadingAnswerChat'
-                                        )!.innerHTML,
+                                    content: answer,
                                 },
                             ]),
                             chatKey,
                             true
                         );
+                        setStreamingAnswer('');
                         setChatLoadingState(ChatLoadingState.ACTIVE);
                         break;
                     }
-
-                    document.querySelector<HTMLElement>(
-                        '#loadingAnswerChat'
-                    )!.innerHTML += decodeAnswer.decode(value);
+                    answer += decodeAnswer.decode(value);
+                    setStreamingAnswer(answer);
                 }
             }
         })();

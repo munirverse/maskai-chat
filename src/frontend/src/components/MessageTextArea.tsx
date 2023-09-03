@@ -1,12 +1,26 @@
-import { KeyboardEvent, useImperativeHandle, useState } from 'react';
+import {
+    KeyboardEvent,
+    useContext,
+    useImperativeHandle,
+    useState,
+} from 'react';
 import { Textarea, forwardRef, useColorModeValue } from '@chakra-ui/react';
 import ResizeTextArea from 'react-textarea-autosize';
+import { ChatContentContext } from '../Contexts';
+import { ChatLoadingState, ChatContentContextValues } from '../Interfaces';
 
 export const MessageTextArea = forwardRef((props, ref) => {
+    const { chat } = useContext(ChatContentContext) as ChatContentContextValues;
+
     const [messageText, setMessageText] = useState('');
 
     const handleTextAreaSubmit = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-        if (e.key === 'Enter' && !e.shiftKey && messageText.trim()) {
+        if (
+            e.key === 'Enter' &&
+            !e.shiftKey &&
+            messageText.trim() &&
+            chat.loadingState.get() !== ChatLoadingState.LOADING
+        ) {
             props.onSubmit(messageText);
             setMessageText('');
             e.preventDefault();

@@ -10,12 +10,34 @@ import {
     useColorModeValue,
 } from '@chakra-ui/react';
 import { FaRobot, FaCircleUser } from 'react-icons/fa6';
+import ReactMarkdown from 'react-markdown';
+import gfm from 'remark-gfm';
+// @ts-ignore
+import SyntaxHighlighter from 'react-syntax-highlighter';
+// @ts-ignore
+import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { ChatContentContext } from '../Contexts';
 import { ChatContentContextValues, ChatLoadingState } from '../Interfaces';
+
+import { marked } from 'marked';
 
 export function MainContentMessage() {
     // Chat Context
     const { chat } = useContext(ChatContentContext) as ChatContentContextValues;
+
+    const markup = () => {
+        marked.setOptions({
+            renderer: new marked.Renderer(),
+            gfm: true,
+            breaks: false,
+        });
+
+        const rawMarkup = marked(chat.streamingAnswer.get());
+
+        return {
+            __html: rawMarkup,
+        };
+    };
 
     const ContentConversationLoading = () => (
         <Stack spacing={10}>
@@ -34,43 +56,99 @@ export function MainContentMessage() {
     );
 
     const ContentConversationActive = () => (
-        <Stack spacing={0}>
+        <Stack spacing={0} flexWrap={'wrap'} fontSize={'lg'}>
             {chat.conversation.get().map((item, index) => (
                 <Box
                     key={`${item.role}${index}`}
-                    bgColor={index % 2 === 0 ? 'gray.200' : 'whitesmoke'}
-                    _dark={{ bg: index % 2 === 0 ? 'gray.700' : 'gray.900' }}
-                    p={'2rem'}
+                    bgColor={item.role === 'user' ? 'gray.200' : 'whitesmoke'}
+                    _dark={{
+                        bg: item.role === 'user' ? 'gray.700' : 'gray.900',
+                    }}
+                    p={'1rem'}
                 >
-                    <HStack px={'1rem'} align={'flex-start'} spacing={5}>
+                    <HStack px={'1rem'} align={'flex-start'} spacing={1}>
                         <Icon
-                            as={index % 2 === 0 ? FaCircleUser : FaRobot}
-                            color={index % 2 === 0 ? 'gray.400' : 'green.400'}
+                            as={item.role === 'user' ? FaCircleUser : FaRobot}
+                            color={
+                                item.role === 'user' ? 'gray.400' : 'green.400'
+                            }
                             _dark={{
-                                color: index % 2 === 0 ? 'white' : 'green.200',
+                                color:
+                                    item.role === 'user'
+                                        ? 'white'
+                                        : 'green.200',
                             }}
                             boxSize={'2rem'}
                         ></Icon>
-                        <Text>{item.content}</Text>
+                        <Box pl={'2'} lineHeight={'2rem'} flexWrap={'wrap'}>
+                            {item.role === 'user' ? (
+                                <Text>{item.content}</Text>
+                            ) : (
+                                <ReactMarkdown
+                                    remarkPlugins={[gfm]}
+                                    components={{
+                                        code({
+                                            inline,
+                                            className,
+                                            children,
+                                            ...props
+                                        }) {
+                                            const match = /language-(\w+)/.exec(
+                                                className || ''
+                                            );
+                                            return !inline && match ? (
+                                                <SyntaxHighlighter
+                                                    {...props}
+                                                    children={String(
+                                                        children
+                                                    ).replace(/\n$/, '')}
+                                                    style={atomOneDark}
+                                                    language={match[1]}
+                                                    PreTag="div"
+                                                    wrapLines="true"
+                                                    wrapLongLines="true"
+                                                />
+                                            ) : (
+                                                <code
+                                                    {...props}
+                                                    className={className}
+                                                >
+                                                    {children}
+                                                </code>
+                                            );
+                                        },
+                                    }}
+                                >
+                                    {item.content}
+                                </ReactMarkdown>
+                            )}
+                        </Box>
                     </HStack>
                 </Box>
             ))}
             <Box
                 bgColor={useColorModeValue('whitesmoke', 'gray.900')}
-                p={'2rem'}
+                p={'1rem'}
                 display={
                     chat.loadingState.get() !== ChatLoadingState.LOADING
                         ? 'none'
                         : undefined
                 }
+                flexWrap={'wrap'}
             >
-                <HStack px={'1rem'} align={'flex-start'} spacing={5}>
+                <HStack px={'1rem'} align={'flex-start'} spacing={1}>
                     <Icon
                         as={FaRobot}
                         color={useColorModeValue('green.400', 'green.200')}
                         boxSize={'2rem'}
                     ></Icon>
-                    <Text id="loadingAnswerChat"></Text>
+                    <Box pl={'2'} lineHeight={'2rem'} flexWrap={'wrap'}>
+                        <Text
+                            id="loadingAnswerChat"
+                            dangerouslySetInnerHTML={markup()}
+                            flexWrap={'wrap'}
+                        ></Text>
+                    </Box>
                 </HStack>
             </Box>
         </Stack>

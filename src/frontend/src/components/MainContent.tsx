@@ -1,4 +1,4 @@
-import { useContext, useRef } from 'react';
+import { useContext, useRef, useEffect } from 'react';
 import {
     Box,
     Flex,
@@ -72,6 +72,21 @@ export default function MainContent() {
                 true
             );
         }
+
+        if (
+            chat.activeKey.get() &&
+            chat.loadingState.get() === ChatLoadingState.ACTIVE
+        ) {
+            chat.conversation.set(
+                chat.conversation
+                    .get()
+                    .slice()
+                    .concat([{ role: 'user', content: message }]),
+                chat.activeKey.get(),
+                true
+            );
+            chat.loadingState.set(ChatLoadingState.LOADING);
+        }
     };
 
     const mainContentDisplay = {
@@ -84,6 +99,18 @@ export default function MainContent() {
     const MainContentDisplayRender =
         // @ts-ignore
         mainContentDisplay[chat.loadingState.get()];
+
+    useEffect(() => {
+        if (chat.loadingState.get() === ChatLoadingState.LOADING) {
+            document
+                .querySelector('#loadingAnswerChat')!
+                .scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'end',
+                    inline: 'nearest',
+                });
+        }
+    }, [chat.loadingState]);
 
     return (
         <Box

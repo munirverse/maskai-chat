@@ -46,6 +46,7 @@ export interface ChatContent {
         | typeof ChatLoadingState.NOT_INIT
         | typeof ChatLoadingState.LOADING
         | typeof ChatLoadingState.ACTIVE;
+    chatStreamingAnswer: string;
 }
 
 export interface ChatConfiguration {
@@ -79,6 +80,10 @@ export interface ChatContentContextValues {
         loadingState: {
             get: (data: void) => ChatContent['chatLoadingState'];
             set: (data: ChatContent['chatLoadingState']) => void;
+        };
+        streamingAnswer: {
+            get: (data: void) => ChatContent['chatStreamingAnswer'];
+            set: (data: ChatContent['chatStreamingAnswer']) => void;
         };
     };
     config: {
