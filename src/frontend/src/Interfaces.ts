@@ -30,6 +30,13 @@ export const ChatLoadingState = {
     DISABLED: 'disabled',
 } as const;
 
+export const ChatNotificationStatus = {
+    SUCCESS: 'success',
+    ERROR: 'error',
+    WARNING: 'warning',
+    INFO: 'info',
+} as const;
+
 export interface ModelGPTListItem {
     name: string;
     isActive: boolean | undefined;
@@ -38,6 +45,15 @@ export interface ModelGPTListItem {
 export interface ConversationMessageItem {
     role: string;
     content: string;
+}
+
+export interface ChatNotificationDetail {
+    message: string;
+    status?:
+        | typeof ChatNotificationStatus.SUCCESS
+        | typeof ChatNotificationStatus.ERROR
+        | typeof ChatNotificationStatus.INFO
+        | typeof ChatNotificationStatus.WARNING;
 }
 
 export interface ChatContent {
@@ -50,6 +66,7 @@ export interface ChatContent {
         | typeof ChatLoadingState.ACTIVE
         | typeof ChatLoadingState.DISABLED;
     chatStreamingAnswer: string;
+    chatNotification: ChatNotificationDetail;
 }
 
 export interface ChatConfiguration {
@@ -87,6 +104,10 @@ export interface ChatContentContextValues {
         streamingAnswer: {
             get: (data: void) => ChatContent['chatStreamingAnswer'];
             set: (data: ChatContent['chatStreamingAnswer']) => void;
+        };
+        notification: {
+            get: (data: void) => ChatContent['chatNotification'];
+            set: (data: ChatContent['chatNotification']) => void;
         };
     };
     config: {

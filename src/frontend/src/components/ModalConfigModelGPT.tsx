@@ -11,11 +11,15 @@ import {
     Select,
 } from '@chakra-ui/react';
 import { ChatContentContext } from '../Contexts';
-import { ModalCustomProps, ChatContentContextValues } from '../Interfaces';
+import {
+    ModalCustomProps,
+    ChatContentContextValues,
+    ChatNotificationStatus,
+} from '../Interfaces';
 
 function ModalConfigModelGPT(props: ModalCustomProps) {
     // Chat Context
-    const { config } = useContext(
+    const { config, chat } = useContext(
         ChatContentContext
     ) as ChatContentContextValues;
 
@@ -43,6 +47,10 @@ function ModalConfigModelGPT(props: ModalCustomProps) {
             })
         );
         setActiveButtonSave(false);
+        chat.notification.set({
+            message: 'sucess change ai model',
+            status: ChatNotificationStatus.SUCCESS,
+        });
     };
 
     useEffect(() => {

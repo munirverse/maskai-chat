@@ -1,3 +1,4 @@
+import { useContext } from 'react';
 import {
     Button,
     Modal,
@@ -8,13 +9,28 @@ import {
     ModalBody,
     ModalCloseButton,
 } from '@chakra-ui/react';
-import { ModalCustomProps } from '../Interfaces';
+import { ChatContentContext } from '../Contexts';
+import {
+    ModalCustomProps,
+    ChatNotificationStatus,
+    ChatContentContextValues,
+} from '../Interfaces';
 
 function ModalConfigClearChat(
     props: ModalCustomProps<{
         confirmClearAllChat: (onClose: () => void) => void;
     }>
 ) {
+    const { chat } = useContext(ChatContentContext) as ChatContentContextValues;
+
+    const handleOnConfirm = () => {
+        props.confirmClearAllChat(props.onClose);
+        chat.notification.set({
+            message: 'success clear all chat',
+            status: ChatNotificationStatus.SUCCESS,
+        });
+    };
+
     return (
         <Modal isOpen={props.isOpen} onClose={props.onClose}>
             <ModalOverlay />
@@ -23,10 +39,7 @@ function ModalConfigClearChat(
                 <ModalCloseButton></ModalCloseButton>
                 <ModalBody>all chat will be delete after this action</ModalBody>
                 <ModalFooter>
-                    <Button
-                        colorScheme="green"
-                        onClick={() => props.confirmClearAllChat(props.onClose)}
-                    >
+                    <Button colorScheme="green" onClick={handleOnConfirm}>
                         OK
                     </Button>
                     <Button variant={'ghost'} onClick={props.onClose}>

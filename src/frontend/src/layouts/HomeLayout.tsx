@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Box, Flex } from '@chakra-ui/react';
+import { Box, Flex, useToast } from '@chakra-ui/react';
 import { SidebarMobileContext, ChatContentContext } from '../Contexts';
 import {
     DefaultProps,
@@ -44,6 +44,10 @@ export default function HomeLayout({ children }: DefaultProps) {
 
     const [streamingAnswer, setStreamingAnswer] =
         useState<ChatContent['chatStreamingAnswer']>('');
+
+    const [chatNotification, setChatNotification] = useState<
+        ChatContent['chatNotification']
+    >({ message: '' });
 
     // async functions
     const getModelGPTList = (apiKey: string) => {
@@ -153,6 +157,14 @@ export default function HomeLayout({ children }: DefaultProps) {
                     setStreamingAnswer(streamingAnswerData);
                 },
             },
+            notification: {
+                get: () => chatNotification,
+                set: (
+                    chatNotificationData: ChatContent['chatNotification']
+                ) => {
+                    setChatNotification(chatNotificationData);
+                },
+            },
         },
         config: {
             model: {
@@ -186,6 +198,9 @@ export default function HomeLayout({ children }: DefaultProps) {
         isActiveSidebarMobile,
         setActiveSidebarMobile,
     ];
+
+    // Chakra toast
+    const notificationToast = useToast();
 
     useEffect(() => {
         (async () => {
@@ -252,6 +267,17 @@ export default function HomeLayout({ children }: DefaultProps) {
                     );
                 }
             }
+
+            if (chatNotification.message) {
+                notificationToast({
+                    title: chatNotification.message,
+                    status: chatNotification.status,
+                    isClosable: true,
+                    duration: 1000,
+                    position: 'top',
+                });
+                setChatNotification({ message: '' });
+            }
         })();
     }, [
         modelGPT,
@@ -261,6 +287,8 @@ export default function HomeLayout({ children }: DefaultProps) {
         modelGPTList,
         chatLoadingState,
         setChatLoadingState,
+        chatNotification,
+        setChatNotification,
     ]);
 
     return (

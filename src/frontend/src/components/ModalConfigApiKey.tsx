@@ -22,11 +22,15 @@ import {
 } from '@chakra-ui/react';
 import { EditIcon } from '@chakra-ui/icons';
 import { ChatContentContext } from '../Contexts';
-import { ModalCustomProps, ChatContentContextValues } from '../Interfaces';
+import {
+    ModalCustomProps,
+    ChatContentContextValues,
+    ChatNotificationStatus,
+} from '../Interfaces';
 
 function ModalConfigApiKey(props: ModalCustomProps) {
     // Chat Context
-    const { config } = useContext(
+    const { config, chat } = useContext(
         ChatContentContext
     ) as ChatContentContextValues;
 
@@ -39,6 +43,10 @@ function ModalConfigApiKey(props: ModalCustomProps) {
     const handleSaveApiKey = () => {
         config.apiKey.set(tempApiKey);
         setApiKeyEditMode(false);
+        chat.notification.set({
+            message: 'sucess save api key',
+            status: ChatNotificationStatus.SUCCESS,
+        });
     };
 
     const handleChangeApiKey = (e: ChangeEvent<HTMLInputElement>) => {
