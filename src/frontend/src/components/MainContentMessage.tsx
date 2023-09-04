@@ -153,6 +153,7 @@ export function MainContentMessage() {
                     </Box>
                 </HStack>
             </Box>
+            <Box id="bottomAnswerChat" p={'0.5'}></Box>
         </Stack>
     );
 

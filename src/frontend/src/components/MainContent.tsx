@@ -108,7 +108,7 @@ export default function MainContent() {
 
     useEffect(() => {
         if (chat.loadingState.get() === ChatLoadingState.LOADING) {
-            document.querySelector('#loadingAnswerChat')!.scrollIntoView({
+            document.querySelector('#bottomAnswerChat')!.scrollIntoView({
                 behavior: 'smooth',
                 block: 'end',
                 inline: 'nearest',
