@@ -6,8 +6,13 @@ import {
     InputRightElement,
     Button,
     useColorModeValue,
+    Alert,
+    AlertDescription,
+    HStack,
+    Stack,
+    Text,
 } from '@chakra-ui/react';
-import { ArrowForwardIcon } from '@chakra-ui/icons';
+import { ArrowForwardIcon, LockIcon } from '@chakra-ui/icons';
 import { SidebarMobileContext, ChatContentContext } from '../Contexts';
 import {
     ChatContentContextValues,
@@ -93,6 +98,7 @@ export default function MainContent() {
         [ChatLoadingState.NOT_INIT]: () => <MainContentDefault />,
         [ChatLoadingState.LOADING]: () => <MainContentMessage />,
         [ChatLoadingState.ACTIVE]: () => <MainContentMessage />,
+        [ChatLoadingState.DISABLED]: () => <MainContentMessage />,
     };
 
     // @ts-ignore
@@ -102,13 +108,11 @@ export default function MainContent() {
 
     useEffect(() => {
         if (chat.loadingState.get() === ChatLoadingState.LOADING) {
-            document
-                .querySelector('#loadingAnswerChat')!
-                .scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'end',
-                    inline: 'nearest',
-                });
+            document.querySelector('#loadingAnswerChat')!.scrollIntoView({
+                behavior: 'smooth',
+                block: 'end',
+                inline: 'nearest',
+            });
         }
     }, [chat.loadingState]);
 
@@ -142,28 +146,47 @@ export default function MainContent() {
                     position={'absolute'}
                     bottom={0}
                 >
-                    <InputGroup>
-                        <MessageTextArea
-                            ref={textAreaRef}
-                            onSubmit={submitMessage}
-                        ></MessageTextArea>
-                        <InputRightElement>
-                            <Button
-                                mr={'1rem'}
-                                mt={'1rem'}
-                                colorScheme={'green'}
-                                onClick={() => submitMessage()}
-                                isLoading={
-                                    chat.loadingState.get() ===
-                                    ChatLoadingState.LOADING
-                                        ? true
-                                        : undefined
-                                }
-                            >
-                                <ArrowForwardIcon></ArrowForwardIcon>
-                            </Button>
-                        </InputRightElement>
-                    </InputGroup>
+                    {chat.loadingState.get() === ChatLoadingState.DISABLED ? (
+                        <Alert status="error" mt={'-2'}>
+                            <Stack spacing={1}>
+                                <HStack spacing={2}>
+                                    <LockIcon></LockIcon>
+                                    <Text fontWeight={'bold'}>
+                                        This chat conversation was disabled,
+                                        please start the new conversation.
+                                    </Text>
+                                </HStack>
+                                <AlertDescription>
+                                    This could be because an error occurred
+                                    while calling the OpenAI API or your token
+                                    has reached its limit.
+                                </AlertDescription>
+                            </Stack>
+                        </Alert>
+                    ) : (
+                        <InputGroup>
+                            <MessageTextArea
+                                ref={textAreaRef}
+                                onSubmit={submitMessage}
+                            ></MessageTextArea>
+                            <InputRightElement>
+                                <Button
+                                    mr={'1rem'}
+                                    mt={'1rem'}
+                                    colorScheme={'green'}
+                                    onClick={() => submitMessage()}
+                                    isLoading={
+                                        chat.loadingState.get() ===
+                                        ChatLoadingState.LOADING
+                                            ? true
+                                            : undefined
+                                    }
+                                >
+                                    <ArrowForwardIcon></ArrowForwardIcon>
+                                </Button>
+                            </InputRightElement>
+                        </InputGroup>
+                    )}
                 </Box>
             </Flex>
         </Box>

@@ -27,7 +27,10 @@ export default function ChatTitleItems() {
             .filter((item) => item.isActive)
             .at(0);
 
-    const handleChangeActiveTitleItem = (indexId: string) => {
+    const handleChangeActiveTitleItem = (
+        indexId: string,
+        isDisabled?: 0 | 1 | undefined
+    ) => {
         chat.titleList.set(
             chat.titleList.get().map((item) => {
                 if (item.isActive && item.id !== indexId) {
@@ -42,6 +45,10 @@ export default function ChatTitleItems() {
         );
         chat.activeKey.set(indexId);
         chat.conversation.reload(indexId);
+        if (isDisabled) {
+            chat.loadingState.set(ChatLoadingState.DISABLED);
+            return;
+        }
         chat.loadingState.set(ChatLoadingState.ACTIVE);
     };
 
@@ -102,7 +109,10 @@ export default function ChatTitleItems() {
                                 id={item.id}
                                 title={item.title}
                                 onSelect={() =>
-                                    handleChangeActiveTitleItem(item.id)
+                                    handleChangeActiveTitleItem(
+                                        item.id,
+                                        item.isDisabled
+                                    )
                                 }
                                 isActive={item.isActive || 0}
                                 onDeleteConfirmation={onOpen}

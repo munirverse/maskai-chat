@@ -203,35 +203,53 @@ export default function HomeLayout({ children }: DefaultProps) {
             }
 
             if (chatLoadingState === ChatLoadingState.LOADING) {
-                const responseAnswer = await getStreamingAnswer(
-                    apiKey,
-                    modelGPT,
-                    chatConversation
-                );
-                const readerAnswer = responseAnswer.body?.getReader();
-                const decodeAnswer = new TextDecoder('utf-8');
-                let answer = '';
-                /* eslint-disable */
-                while (true) {
-                    // @ts-ignore
-                    const { value, done } = await readerAnswer?.read();
-                    if (done) {
-                        chatContentContextValue.chat.conversation.set(
-                            chatConversation.slice().concat([
-                                {
-                                    role: 'assistant',
-                                    content: answer,
-                                },
-                            ]),
-                            chatKey,
-                            true
-                        );
-                        setStreamingAnswer('');
-                        setChatLoadingState(ChatLoadingState.ACTIVE);
-                        break;
+                try {
+                    const responseAnswer = await getStreamingAnswer(
+                        apiKey,
+                        modelGPT,
+                        chatConversation
+                    );
+                    const readerAnswer = responseAnswer.body?.getReader();
+                    const decodeAnswer = new TextDecoder('utf-8');
+                    let answer = '';
+                    /* eslint-disable */
+                    while (true) {
+                        // @ts-ignore
+                        const { value, done } = await readerAnswer?.read();
+                        if (done) {
+                            if (!answer) {
+                                throw new Error(
+                                    'error happen when calling the API, check the backend log'
+                                );
+                            }
+                            chatContentContextValue.chat.conversation.set(
+                                chatConversation.slice().concat([
+                                    {
+                                        role: 'assistant',
+                                        content: answer,
+                                    },
+                                ]),
+                                chatKey,
+                                true
+                            );
+                            setStreamingAnswer('');
+                            setChatLoadingState(ChatLoadingState.ACTIVE);
+                            break;
+                        }
+                        answer += decodeAnswer.decode(value);
+                        setStreamingAnswer(answer);
                     }
-                    answer += decodeAnswer.decode(value);
-                    setStreamingAnswer(answer);
+                } catch (error) {
+                    console.error(error);
+                    setChatLoadingState(ChatLoadingState.DISABLED);
+                    setChaTitleList((prev) =>
+                        prev.map((item) => {
+                            if (item.id === chatKey) {
+                                item.isDisabled = 1;
+                            }
+                            return item;
+                        })
+                    );
                 }
             }
         })();

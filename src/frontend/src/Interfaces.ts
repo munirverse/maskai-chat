@@ -4,6 +4,7 @@ export interface ChatTitleItem {
     id: string;
     title: string;
     isActive?: 0 | 1 | undefined;
+    isDisabled?: 0 | 1 | undefined;
 }
 
 export interface ChatTitleItemProps extends ChatTitleItem {
@@ -26,6 +27,7 @@ export const ChatLoadingState = {
     NOT_INIT: 'notinit',
     LOADING: 'loading',
     ACTIVE: 'active',
+    DISABLED: 'disabled',
 } as const;
 
 export interface ModelGPTListItem {
@@ -45,7 +47,8 @@ export interface ChatContent {
     chatLoadingState:
         | typeof ChatLoadingState.NOT_INIT
         | typeof ChatLoadingState.LOADING
-        | typeof ChatLoadingState.ACTIVE;
+        | typeof ChatLoadingState.ACTIVE
+        | typeof ChatLoadingState.DISABLED;
     chatStreamingAnswer: string;
 }
 
