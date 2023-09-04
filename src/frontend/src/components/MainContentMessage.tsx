@@ -82,7 +82,9 @@ export function MainContentMessage() {
                         ></Icon>
                         <Box pl={'2'} lineHeight={'2rem'} flexWrap={'wrap'}>
                             {item.role === 'user' ? (
-                                <Text>{item.content}</Text>
+                                <Text whiteSpace={'pre-line'}>
+                                    {item.content}
+                                </Text>
                             ) : (
                                 <ReactMarkdown
                                     remarkPlugins={[gfm]}
