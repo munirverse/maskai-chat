@@ -38,7 +38,8 @@ export function MainContentDefault() {
             <MaskaiChatIcon {...mainContentDefaulIconProps}></MaskaiChatIcon>
             <Text {...mainContentDefaultTitleProps}>Mask Chat AI</Text>
             <Box {...mainContentDefaultDescriptionProps}>
-                "Masking UI of Chatgpt & OpenAI API for yourself"<br></br>
+                "An Opensource Self-hosting Webchat for ChatGPT/OpenAI API
+                Services"<br></br>
                 Click `New Chat` and enjoy 😉
             </Box>
         </Stack>

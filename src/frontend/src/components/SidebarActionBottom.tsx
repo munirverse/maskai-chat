@@ -20,6 +20,7 @@ import { ChatLoadingState, ChatContentContextValues } from '../Interfaces';
 import ModalConfigClearChat from './ModalConfigClearChat';
 import ModalConfigApiKey from './ModalConfigApiKey';
 import ModalConfigModelGPT from './ModalConfigModelGPT';
+import ModalAbout from './ModalAbout';
 
 export default function SidebarActionBottom() {
     // Chat Context
@@ -54,11 +55,18 @@ export default function SidebarActionBottom() {
         onClose: onCloseModelGPTModal,
     } = useDisclosure();
 
+    // Modal About
+    const {
+        isOpen: isOpenModalAbout,
+        onOpen: onOpenModalAbout,
+        onClose: onCloseModalAbout,
+    } = useDisclosure();
+
     return (
         <Box bg={useColorModeValue('white', 'gray.900')} p={'1rem'}>
             <HStack>
                 <Menu>
-                    <Button>
+                    <Button onClick={onOpenModalAbout}>
                         <QuestionIcon></QuestionIcon>
                     </Button>
                     <MenuButton
@@ -97,6 +105,10 @@ export default function SidebarActionBottom() {
                 isOpen={isOpenModelGPTModal}
                 onClose={onCloseModelGPTModal}
             ></ModalConfigModelGPT>
+            <ModalAbout
+                isOpen={isOpenModalAbout}
+                onClose={onCloseModalAbout}
+            ></ModalAbout>
         </Box>
     );
 }
