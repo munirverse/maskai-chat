@@ -11,6 +11,14 @@ import {
     HStack,
     Stack,
     Text,
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalFooter,
+    ModalHeader,
+    ModalBody,
+    ModalCloseButton,
+    useDisclosure,
 } from '@chakra-ui/react';
 import { ArrowForwardIcon, LockIcon } from '@chakra-ui/icons';
 import { SidebarMobileContext, ChatContentContext } from '../Contexts';
@@ -29,11 +37,25 @@ export default function MainContent() {
     const [isActiveSidebarMobile] = useContext(SidebarMobileContext);
 
     // Chat Context
-    const { chat } = useContext(ChatContentContext) as ChatContentContextValues;
+    const { chat, config } = useContext(
+        ChatContentContext
+    ) as ChatContentContextValues;
+
+    // Modal error submit
+    const {
+        isOpen: isOpenModalErrorSubmit,
+        onOpen: onOpenModalErrorSubmit,
+        onClose: onCloseModalErrorSubmit,
+    } = useDisclosure();
 
     const textAreaRef = useRef();
 
     const submitMessage = (message?: string) => {
+        if (!config.apiKey.get()) {
+            onOpenModalErrorSubmit();
+            return;
+        }
+
         if (!message) {
             const messageElement = document.querySelector<HTMLTextAreaElement>(
                 '#chatMessageTextArea'
@@ -189,6 +211,29 @@ export default function MainContent() {
                     )}
                 </Box>
             </Flex>
+            <Modal
+                isOpen={isOpenModalErrorSubmit}
+                onClose={onCloseModalErrorSubmit}
+            >
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>Failed to Submit</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody>
+                        You need to store the Open API Key first before continue
+                        to submit message, go to `Configuration` &gt; `API
+                        Keys`.
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button
+                            variant={'ghost'}
+                            onClick={onCloseModalErrorSubmit}
+                        >
+                            Close
+                        </Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
         </Box>
     );
 }
