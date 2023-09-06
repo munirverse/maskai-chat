@@ -1,0 +1,28 @@
+version: '3.1'
+
+services:
+
+  backend:
+    image: python:alpine3.18
+    container_name: maskai_be
+    working_dir: /app
+    ports:
+      - ${BE_PORT}:${BE_PORT}
+    volumes:
+      - ./src/backend:/app
+      - .env:/app/.env
+    command: sh -c 'pip3 install --no-cache-dir -r requirements.txt;python main.py'
+
+  frontend:
+    image: node:18.16-alpine3.18
+    container_name: maskai_fe
+    working_dir: /app
+    ports:
+      - ${FE_PORT}:${FE_PORT}
+    volumes:
+      - ./src/frontend:/app
+      - /app/node_modules
+      - .env:/app/.env
+    command: sh -c 'npm install;npm run dev -- --host;'
+    depends_on:
+      - backend
