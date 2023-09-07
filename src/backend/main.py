@@ -20,6 +20,12 @@ def main():
     # enabling cors
     CORS(app, resources={r"/api/*": {"origins": "*"}})
 
+
+    # ping healthcheck endpoint
+    @app.route('/ping')
+    def ping():
+        return 'pong!'
+
     # register blueprint controller
     app.register_blueprint(openai_controller, url_prefix="/api/openai")
 
